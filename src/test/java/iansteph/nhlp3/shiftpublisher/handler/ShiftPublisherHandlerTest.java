@@ -37,20 +37,21 @@ public class ShiftPublisherHandlerTest {
 
         final Document parsedToiReport = nhlToiProxy.getToiReportForGame(shiftPublisherRequest.getGameId(), team);
 
-
-        final Elements elements = parsedToiReport.getElementsByClass("pageBreakAfter");
-        final Element topLevelTable = elements.get(0).children().get(0);
-        final Node topLevelTableBody = topLevelTable.childNodes().get(1);
-        final Node topLevelTableBodyTeamData = topLevelTableBody.childNodes().get(6);
-        final Node topLevelTableBodyTeamDataTable = topLevelTableBodyTeamData.childNodes().get(1);
-        final Node topLevelTableBodyTeamDataTableData = topLevelTableBodyTeamDataTable.childNodes().get(1);
-        final Node toiReportTableBody = topLevelTableBodyTeamDataTableData.childNodes().get(1);
+        final Element mainDataTable = parsedToiReport
+                .body()    // Get the HTML body
+                .child(2)  // Get the main section of the page
+                .child(0)  // Narrow down into top-most table
+                .child(0)  // Narrow down into table body
+                .child(3)  // Skip to the beginning of shift data rows
+                .child(0)  // Remove surrounding <td> element containing all shift data
+                .child(0)  // Narrow down into surrounding <table> element containing all shift data
+                .child(0); // Narrow down into table body element containing all shift data
 
         final Map<String, List<Element>> rawTimeOnIceData = new HashMap<>();
         final Stack<String> currentGroupingQueue = new Stack<>();
         currentGroupingQueue.push(null);
 
-        toiReportTableBody.childNodes().stream()
+        mainDataTable.childNodes().stream()
                 .filter(node -> node instanceof Element)
                 .map(node -> (Element) node)
                 .forEach(element -> {
