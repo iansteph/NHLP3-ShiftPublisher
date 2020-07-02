@@ -7,9 +7,7 @@ import iansteph.nhlp3.shiftpublisher.model.request.ShiftPublisherRequest;
 import iansteph.nhlp3.shiftpublisher.proxy.NhlToiProxy;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.select.Elements;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -51,26 +49,21 @@ public class ShiftPublisherHandlerTest {
         final Stack<String> currentGroupingQueue = new Stack<>();
         currentGroupingQueue.push(null);
 
-        mainDataTable.childNodes().stream()
-                .filter(node -> node instanceof Element)
-                .map(node -> (Element) node)
+        mainDataTable.children()
                 .forEach(element -> {
 
-                    final boolean one = element.childrenSize() == 1;
-                    final Element firstChild = element.children().get(0);
-                    final boolean firstChildElementIsPlayerHeader = firstChild.hasClass("playerHeading + border");
-                    final Node firstChildsNode = firstChild.childNode(0);
-                    final boolean firstChildsNodeIsTextNode = firstChildsNode instanceof TextNode;
-                    final boolean firstChildsTextNodeIsNotBlank = !((TextNode) firstChildsNode).isBlank();
+                    final boolean doesElementHaveChildren = element.childrenSize() == 1;
+                    final Element childElement = element.child(0);
+                    final boolean isPlayerHeaderChildElement = childElement.hasClass("playerHeading + border");
+                    final TextNode grandchildElement = (TextNode) childElement.childNode(0);
+                    final String grandchildTextNodeValue = grandchildElement.text();
                     final String currentGrouping = currentGroupingQueue.peek();
-                    if (one &&
-                        firstChildElementIsPlayerHeader &&
-                        firstChildsNodeIsTextNode &&
-                        firstChildsTextNodeIsNotBlank) {
+                    if (doesElementHaveChildren &&
+                        isPlayerHeaderChildElement &&
+                        !grandchildTextNodeValue.trim().isEmpty()) {
 
-                        final String playerHeadingRawText = ((TextNode) firstChildsNode).text();
-                        currentGroupingQueue.push(playerHeadingRawText);
-                        rawTimeOnIceData.put(playerHeadingRawText, new ArrayList<>());
+                        currentGroupingQueue.push(grandchildTextNodeValue);
+                        rawTimeOnIceData.put(grandchildTextNodeValue, new ArrayList<>());
                     }
                     else if (currentGrouping != null) {
 
