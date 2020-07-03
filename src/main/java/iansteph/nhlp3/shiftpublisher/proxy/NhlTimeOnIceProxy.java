@@ -6,11 +6,11 @@ import org.jsoup.nodes.Document;
 
 import static java.lang.String.format;
 
-public class NhlToiProxy {
+public class NhlTimeOnIceProxy {
 
     private final NhlToiClient nhlToiClient;
 
-    public NhlToiProxy(final NhlToiClient nhlToiClient) {
+    public NhlTimeOnIceProxy(final NhlToiClient nhlToiClient) {
 
         if (nhlToiClient == null) {
 

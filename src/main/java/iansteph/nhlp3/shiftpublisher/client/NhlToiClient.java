@@ -26,5 +26,7 @@ public class NhlToiClient {
         final Document toiReport = jsoupWrapper.parseHtmlFromUrl(resolvedUrl);
         LOGGER.info(format("Successfully retrieved TOI report for game %s in season %s for team %s", game, season, teamAbbreviation));
         return toiReport;
+
+        // TODO - Create method to archive TOI report file in S3 which catches all failures and logs them silently
     }
 }

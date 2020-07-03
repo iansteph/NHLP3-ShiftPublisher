@@ -4,17 +4,11 @@ import iansteph.nhlp3.shiftpublisher.client.NhlToiClient;
 import iansteph.nhlp3.shiftpublisher.client.wrapper.JsoupWrapper;
 import iansteph.nhlp3.shiftpublisher.model.Team;
 import iansteph.nhlp3.shiftpublisher.model.request.ShiftPublisherRequest;
-import iansteph.nhlp3.shiftpublisher.proxy.NhlToiProxy;
+import iansteph.nhlp3.shiftpublisher.model.toi.TimeOnIceReport;
+import iansteph.nhlp3.shiftpublisher.parse.TimeOnIceReportParser;
+import iansteph.nhlp3.shiftpublisher.proxy.NhlTimeOnIceProxy;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -24,7 +18,7 @@ public class ShiftPublisherHandlerTest {
 
     private final JsoupWrapper jsoupWrapper = new JsoupWrapper();
     private final NhlToiClient nhlToiClient = new NhlToiClient(jsoupWrapper);
-    private final NhlToiProxy nhlToiProxy = new NhlToiProxy(nhlToiClient);
+    private final NhlTimeOnIceProxy nhlTimeOnIceProxy = new NhlTimeOnIceProxy(nhlToiClient);
 
     @Test
     public void test_temporary_integration_test_to_verify_TOI_report_is_parsed() {
@@ -32,44 +26,10 @@ public class ShiftPublisherHandlerTest {
         final ShiftPublisherRequest shiftPublisherRequest = new ShiftPublisherRequest();
         shiftPublisherRequest.setGameId(2019021079);
         final Team team = Team.HOME;
+        final TimeOnIceReportParser timeOnIceReportParser = new TimeOnIceReportParser();
 
-        final Document parsedToiReport = nhlToiProxy.getToiReportForGame(shiftPublisherRequest.getGameId(), team);
-
-        final Element mainDataTable = parsedToiReport
-                .body()    // Get the HTML body
-                .child(2)  // Get the main section of the page
-                .child(0)  // Narrow down into top-most table
-                .child(0)  // Narrow down into table body
-                .child(3)  // Skip to the beginning of shift data rows
-                .child(0)  // Remove surrounding <td> element containing all shift data
-                .child(0)  // Narrow down into surrounding <table> element containing all shift data
-                .child(0); // Narrow down into table body element containing all shift data
-
-        final Map<String, List<Element>> rawTimeOnIceData = new HashMap<>();
-        final Stack<String> currentGroupingQueue = new Stack<>();
-        currentGroupingQueue.push(null);
-
-        mainDataTable.children()
-                .forEach(element -> {
-
-                    final boolean doesElementHaveChildren = element.childrenSize() == 1;
-                    final Element childElement = element.child(0);
-                    final boolean isPlayerHeaderChildElement = childElement.hasClass("playerHeading + border");
-                    final TextNode grandchildElement = (TextNode) childElement.childNode(0);
-                    final String grandchildTextNodeValue = grandchildElement.text();
-                    final String currentGrouping = currentGroupingQueue.peek();
-                    if (doesElementHaveChildren &&
-                        isPlayerHeaderChildElement &&
-                        !grandchildTextNodeValue.trim().isEmpty()) {
-
-                        currentGroupingQueue.push(grandchildTextNodeValue);
-                        rawTimeOnIceData.put(grandchildTextNodeValue, new ArrayList<>());
-                    }
-                    else if (currentGrouping != null) {
-
-                        rawTimeOnIceData.get(currentGrouping).add(element);
-                    }
-                });
+        final Document parsedToiReport = nhlTimeOnIceProxy.getToiReportForGame(shiftPublisherRequest.getGameId(), team);
+        final TimeOnIceReport timeOnIceReport = timeOnIceReportParser.parse(parsedToiReport);
 
         /*
          * TODO
