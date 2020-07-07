@@ -1,6 +1,6 @@
 package iansteph.nhlp3.shiftpublisher.proxy;
 
-import iansteph.nhlp3.shiftpublisher.client.NhlToiClient;
+import iansteph.nhlp3.shiftpublisher.client.NhlTimeOnIceClient;
 import iansteph.nhlp3.shiftpublisher.client.wrapper.JsoupWrapper;
 import iansteph.nhlp3.shiftpublisher.model.Team;
 import org.jsoup.nodes.Document;
@@ -18,22 +18,22 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class NhlToiProxyTest {
+public class NhlTimeOnIceProxyTest {
 
     private static final int GAME_ID = 2019021079;
     private static final Team TEAM = Team.VISITOR;
 
-    private final NhlToiClient mockNhlToiClient = mock(NhlToiClient.class);
-    private final NhlToiProxy nhlToiProxy = new NhlToiProxy(mockNhlToiClient);
+    private final NhlTimeOnIceClient mockNhlTimeOnIceClient = mock(NhlTimeOnIceClient.class);
+    private final NhlTimeOnIceProxy nhlTimeOnIceProxy = new NhlTimeOnIceProxy(mockNhlTimeOnIceClient);
 
     @Test
     public void test_constructor_successfully_builds_NhlToiProxy_when_non_null_NhlToiClient_provided() {
 
-        final NhlToiClient nhlToiClient = new NhlToiClient(new JsoupWrapper());
+        final NhlTimeOnIceClient nhlTimeOnIceClient = new NhlTimeOnIceClient(new JsoupWrapper());
 
         try {
 
-            final NhlToiProxy nhlToiProxy = new NhlToiProxy(nhlToiClient);
+            final NhlTimeOnIceProxy nhlTimeOnIceProxy = new NhlTimeOnIceProxy(nhlTimeOnIceClient);
         }
         catch (final Exception e) {
 
@@ -44,7 +44,7 @@ public class NhlToiProxyTest {
     @Test(expected = IllegalArgumentException.class)
     public void test_constructor_throws_exception_when_null_NhlToiClient_provided() {
 
-        new NhlToiProxy(null);
+        new NhlTimeOnIceProxy(null);
     }
 
     @Test
@@ -53,20 +53,20 @@ public class NhlToiProxyTest {
         final String season = "20192020";
         final String teamAbbreviation = "V";
         final String game = "021079";
-        when(mockNhlToiClient.getTeamToiReportForGame(eq(season), eq(teamAbbreviation), eq(game))).thenReturn(new Document("SomeBaseUri"));
+        when(mockNhlTimeOnIceClient.getTeamToiReportForGame(eq(season), eq(teamAbbreviation), eq(game))).thenReturn(new Document("SomeBaseUri"));
 
-        final Document result = nhlToiProxy.getToiReportForGame(GAME_ID, TEAM);
+        final Document result = nhlTimeOnIceProxy.getToiReportForGame(GAME_ID, TEAM);
 
         assertThat(result, is(notNullValue()));
-        verify(mockNhlToiClient, times(1)).getTeamToiReportForGame(eq(season), eq(teamAbbreviation), eq(game));
+        verify(mockNhlTimeOnIceClient, times(1)).getTeamToiReportForGame(eq(season), eq(teamAbbreviation), eq(game));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_getToiReportForGame_throws_IllegalArgumentException_when_gameId_is_negative() {
 
-        nhlToiProxy.getToiReportForGame(-2019021079, TEAM);
+        nhlTimeOnIceProxy.getToiReportForGame(-2019021079, TEAM);
 
-        verify(mockNhlToiClient, never()).getTeamToiReportForGame(anyString(), anyString(), anyString());
+        verify(mockNhlTimeOnIceClient, never()).getTeamToiReportForGame(anyString(), anyString(), anyString());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -74,9 +74,9 @@ public class NhlToiProxyTest {
 
         final int gameId = 2019;
 
-        nhlToiProxy.getToiReportForGame(gameId, TEAM);
+        nhlTimeOnIceProxy.getToiReportForGame(gameId, TEAM);
 
-        verify(mockNhlToiClient, never()).getTeamToiReportForGame(anyString(), anyString(), anyString());
+        verify(mockNhlTimeOnIceClient, never()).getTeamToiReportForGame(anyString(), anyString(), anyString());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -84,16 +84,16 @@ public class NhlToiProxyTest {
 
         final int gameId = 1900021079;
 
-        nhlToiProxy.getToiReportForGame(gameId, TEAM);
+        nhlTimeOnIceProxy.getToiReportForGame(gameId, TEAM);
 
-        verify(mockNhlToiClient, never()).getTeamToiReportForGame(anyString(), anyString(), anyString());
+        verify(mockNhlTimeOnIceClient, never()).getTeamToiReportForGame(anyString(), anyString(), anyString());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_getToiReportForGame_throws_IllegalArgumentException_when_team_is_null() {
 
-        nhlToiProxy.getToiReportForGame(GAME_ID, null);
+        nhlTimeOnIceProxy.getToiReportForGame(GAME_ID, null);
 
-        verify(mockNhlToiClient, never()).getTeamToiReportForGame(anyString(), anyString(), anyString());
+        verify(mockNhlTimeOnIceClient, never()).getTeamToiReportForGame(anyString(), anyString(), anyString());
     }
 }

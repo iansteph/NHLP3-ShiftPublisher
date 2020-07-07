@@ -7,14 +7,14 @@ import org.jsoup.nodes.Document;
 
 import static java.lang.String.format;
 
-public class NhlToiClient {
+public class NhlTimeOnIceClient {
 
-    private static final Logger LOGGER = LogManager.getLogger(NhlToiClient.class);
+    private static final Logger LOGGER = LogManager.getLogger(NhlTimeOnIceClient.class);
 
     private final JsoupWrapper jsoupWrapper;
 
 
-    public NhlToiClient(final JsoupWrapper jsoupWrapper) {
+    public NhlTimeOnIceClient(final JsoupWrapper jsoupWrapper) {
 
         this.jsoupWrapper = jsoupWrapper;
     }
@@ -26,5 +26,7 @@ public class NhlToiClient {
         final Document toiReport = jsoupWrapper.parseHtmlFromUrl(resolvedUrl);
         LOGGER.info(format("Successfully retrieved TOI report for game %s in season %s for team %s", game, season, teamAbbreviation));
         return toiReport;
+
+        // TODO - Create method to archive TOI report file in S3 which catches all failures and logs them silently
     }
 }
