@@ -154,14 +154,18 @@ public class TimeOnIceReportParser {
                 .map(element -> element.child(0))
                 .filter(element -> !element.childNodes().isEmpty())
                 .map(element -> ((TextNode) element.childNode(0)).text().trim())
+                .filter(string -> !string.isEmpty())
                 .collect(Collectors.toList());
 
+        // Playoff game TOI Reports have an additional line in this section for the playoff round name
+        int indexOffsetIfPlayoffGame = rawSharedGameContext.size() == 7 ? 1 : 0;
+
         // Date
-        final String rawDate = rawSharedGameContext.get(2);
+        final String rawDate = rawSharedGameContext.get(1 + indexOffsetIfPlayoffGame);
         timeOnIceReportWithVisitorAndHomeContext.setDate(rawDate);
 
         // Venue context
-        final String[] rawVenueContextComponents = rawSharedGameContext.get(3).split("at");
+        final String[] rawVenueContextComponents = rawSharedGameContext.get(2 + indexOffsetIfPlayoffGame).split("at");
 
         // Attendance
         final String[] attendanceComponents = rawVenueContextComponents[0].split(" ");
@@ -181,7 +185,7 @@ public class TimeOnIceReportParser {
         timeOnIceReportWithVisitorAndHomeContext.setVenueName(venueName);
 
         // Game time
-        final String[] gameTimeComponents = rawSharedGameContext.get(4).split(";");
+        final String[] gameTimeComponents = rawSharedGameContext.get(3 + indexOffsetIfPlayoffGame).split(";");
 
         // Start time
         final String startTime = gameTimeComponents[0].trim().substring(6);
@@ -192,11 +196,11 @@ public class TimeOnIceReportParser {
         timeOnIceReportWithVisitorAndHomeContext.setEndTime(endTime);
 
         // NHL game number
-        final String nhlGameNumber = rawSharedGameContext.get(5).trim().substring(5);
+        final String nhlGameNumber = rawSharedGameContext.get(4 + indexOffsetIfPlayoffGame).trim().substring(5);
         timeOnIceReportWithVisitorAndHomeContext.setNhlGameNumber(nhlGameNumber);
 
         // Game state
-        final String gameState = rawSharedGameContext.get(6);
+        final String gameState = rawSharedGameContext.get(5 + indexOffsetIfPlayoffGame);
         timeOnIceReportWithVisitorAndHomeContext.setGameState(gameState);
         return timeOnIceReportWithVisitorAndHomeContext;
     }
@@ -325,48 +329,53 @@ public class TimeOnIceReportParser {
                     final List<String> columns = element.children().stream()
                             .map(childElement -> ((TextNode) childElement.childNode(0)).text().trim())
                             .collect(Collectors.toList());
-                    final ShiftAggregation shiftAggregation = new ShiftAggregation();
 
-                    // Aggregation name
-                    final String aggregationName = columns.get(0);
-                    shiftAggregation.setAggregationName(aggregationName);
+                    // Sometimes there can be an empty row in the summary section... 🤷‍♀️
+                    // - Example: http://www.nhl.com/scores/htmlreports/20192020/TV020273.HTM @ 52 BEMSTROM, EMIL between the "3" and "TOT" rows
+                    if (!columns.isEmpty()) {
+                        
+                        final ShiftAggregation shiftAggregation = new ShiftAggregation();
 
-                    // Shifts For
-                    final String rawShiftsFor = columns.get(1);
-                    shiftAggregation.setShiftsFor(Integer.parseInt(rawShiftsFor));
+                        // Aggregation name
+                        final String aggregationName = columns.get(0);
+                        shiftAggregation.setAggregationName(aggregationName);
 
-                    // Average Shift Length
-                    final String rawAverageShiftLength = columns.get(2);
-                    final Duration averageShiftLength = durationFromTextNode(rawAverageShiftLength);
-                    shiftAggregation.setAverageShiftLength(averageShiftLength);
+                        // Shifts For
+                        final String rawShiftsFor = columns.get(1);
+                        shiftAggregation.setShiftsFor(Integer.parseInt(rawShiftsFor));
 
-                    // TOI
-                    final String rawTimeOnIce = columns.get(3);
-                    final Duration timeOnIce = durationFromTextNode(rawTimeOnIce);
-                    shiftAggregation.setTimeOnIce(timeOnIce);
+                        // Average Shift Length
+                        final String rawAverageShiftLength = columns.get(2);
+                        final Duration averageShiftLength = durationFromTextNode(rawAverageShiftLength);
+                        shiftAggregation.setAverageShiftLength(averageShiftLength);
 
-                    // Even strength TOI
-                    final String rawEvenStrengthTimeOnIce = columns.get(4);
-                    final Duration evenStrengthTimeOnIce = durationFromTextNode(rawEvenStrengthTimeOnIce);
-                    shiftAggregation.setEvenStrengthTimeOnIce(evenStrengthTimeOnIce);
+                        // TOI
+                        final String rawTimeOnIce = columns.get(3);
+                        final Duration timeOnIce = durationFromTextNode(rawTimeOnIce);
+                        shiftAggregation.setTimeOnIce(timeOnIce);
 
-                    // Power play TOI
-                    final String rawPowerPlayTimeOnIce = columns.get(5);
-                    final Duration powerPlaceTimeOnIce = durationFromTextNode(rawPowerPlayTimeOnIce);
-                    shiftAggregation.setPowerPlayTimeOnIce(powerPlaceTimeOnIce);
+                        // Even strength TOI
+                        final String rawEvenStrengthTimeOnIce = columns.get(4);
+                        final Duration evenStrengthTimeOnIce = durationFromTextNode(rawEvenStrengthTimeOnIce);
+                        shiftAggregation.setEvenStrengthTimeOnIce(evenStrengthTimeOnIce);
 
-                    // Shorthanded TOI
-                    final String rawShortHandedTimeOnIce = columns.get(6);
-                    final Duration shortHandedTimeOnice = durationFromTextNode(rawShortHandedTimeOnIce);
-                    shiftAggregation.setShortHandedTimeOnIce(shortHandedTimeOnice);
+                        // Power play TOI
+                        final String rawPowerPlayTimeOnIce = columns.get(5);
+                        final Duration powerPlaceTimeOnIce = durationFromTextNode(rawPowerPlayTimeOnIce);
+                        shiftAggregation.setPowerPlayTimeOnIce(powerPlaceTimeOnIce);
 
-                    if (aggregationName.equals(TOTAL_SHIFT_AGGREGATION)) {
+                        // Shorthanded TOI
+                        final String rawShortHandedTimeOnIce = columns.get(6);
+                        final Duration shortHandedTimeOnice = durationFromTextNode(rawShortHandedTimeOnIce);
+                        shiftAggregation.setShortHandedTimeOnIce(shortHandedTimeOnice);
 
-                        summary.setTotals(shiftAggregation);
-                    }
-                    else {
+                        if (aggregationName.equals(TOTAL_SHIFT_AGGREGATION)) {
 
-                        shiftAggregations.add(shiftAggregation);
+                            summary.setTotals(shiftAggregation);
+                        } else {
+
+                            shiftAggregations.add(shiftAggregation);
+                        }
                     }
                 });
 
