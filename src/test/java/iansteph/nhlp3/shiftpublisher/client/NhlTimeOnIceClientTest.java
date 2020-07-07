@@ -11,21 +11,21 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class NhlToiClientTest {
+public class NhlTimeOnIceClientTest {
 
     private final static String SEASON = "20192020";
     private final static String TEAM_ABBREVIATION = "V";
     private final static String GAME = "021079";
 
     private final JsoupWrapper mockJsoupWrapper = mock(JsoupWrapper.class);
-    private final NhlToiClient nhlToiClient = new NhlToiClient(mockJsoupWrapper);
+    private final NhlTimeOnIceClient nhlTimeOnIceClient = new NhlTimeOnIceClient(mockJsoupWrapper);
 
     @Test
     public void test_getTeamToiReportForGame_successfully_retrieves_toi_report_for_game() {
 
         when(mockJsoupWrapper.parseHtmlFromUrl(anyString())).thenReturn(new Document("SomeBaseUri"));
 
-        final Document actual = nhlToiClient.getTeamToiReportForGame(SEASON, TEAM_ABBREVIATION, GAME);
+        final Document actual = nhlTimeOnIceClient.getTeamToiReportForGame(SEASON, TEAM_ABBREVIATION, GAME);
 
         assertThat(actual, is(notNullValue()));
     }
@@ -35,6 +35,6 @@ public class NhlToiClientTest {
 
         when(mockJsoupWrapper.parseHtmlFromUrl(anyString())).thenThrow(new RuntimeException());
 
-        nhlToiClient.getTeamToiReportForGame(SEASON, TEAM_ABBREVIATION, GAME);
+        nhlTimeOnIceClient.getTeamToiReportForGame(SEASON, TEAM_ABBREVIATION, GAME);
     }
 }

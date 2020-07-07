@@ -1,6 +1,6 @@
 package iansteph.nhlp3.shiftpublisher.handler;
 
-import iansteph.nhlp3.shiftpublisher.client.NhlToiClient;
+import iansteph.nhlp3.shiftpublisher.client.NhlTimeOnIceClient;
 import iansteph.nhlp3.shiftpublisher.client.wrapper.JsoupWrapper;
 import iansteph.nhlp3.shiftpublisher.model.Team;
 import iansteph.nhlp3.shiftpublisher.model.request.ShiftPublisherRequest;
@@ -17,8 +17,8 @@ import static org.junit.Assert.assertThat;
 public class ShiftPublisherHandlerTest {
 
     private final JsoupWrapper jsoupWrapper = new JsoupWrapper();
-    private final NhlToiClient nhlToiClient = new NhlToiClient(jsoupWrapper);
-    private final NhlTimeOnIceProxy nhlTimeOnIceProxy = new NhlTimeOnIceProxy(nhlToiClient);
+    private final NhlTimeOnIceClient nhlTimeOnIceClient = new NhlTimeOnIceClient(jsoupWrapper);
+    private final NhlTimeOnIceProxy nhlTimeOnIceProxy = new NhlTimeOnIceProxy(nhlTimeOnIceClient);
 
     @Test
     public void test_temporary_integration_test_to_verify_TOI_report_is_parsed() {

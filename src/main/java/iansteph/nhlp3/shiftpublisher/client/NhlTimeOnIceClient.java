@@ -7,14 +7,14 @@ import org.jsoup.nodes.Document;
 
 import static java.lang.String.format;
 
-public class NhlToiClient {
+public class NhlTimeOnIceClient {
 
-    private static final Logger LOGGER = LogManager.getLogger(NhlToiClient.class);
+    private static final Logger LOGGER = LogManager.getLogger(NhlTimeOnIceClient.class);
 
     private final JsoupWrapper jsoupWrapper;
 
 
-    public NhlToiClient(final JsoupWrapper jsoupWrapper) {
+    public NhlTimeOnIceClient(final JsoupWrapper jsoupWrapper) {
 
         this.jsoupWrapper = jsoupWrapper;
     }

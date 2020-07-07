@@ -1,6 +1,6 @@
 package iansteph.nhlp3.shiftpublisher.proxy;
 
-import iansteph.nhlp3.shiftpublisher.client.NhlToiClient;
+import iansteph.nhlp3.shiftpublisher.client.NhlTimeOnIceClient;
 import iansteph.nhlp3.shiftpublisher.model.Team;
 import org.jsoup.nodes.Document;
 
@@ -8,15 +8,15 @@ import static java.lang.String.format;
 
 public class NhlTimeOnIceProxy {
 
-    private final NhlToiClient nhlToiClient;
+    private final NhlTimeOnIceClient nhlTimeOnIceClient;
 
-    public NhlTimeOnIceProxy(final NhlToiClient nhlToiClient) {
+    public NhlTimeOnIceProxy(final NhlTimeOnIceClient nhlTimeOnIceClient) {
 
-        if (nhlToiClient == null) {
+        if (nhlTimeOnIceClient == null) {
 
             throw new IllegalArgumentException("When constructing NhlToiProxy the NhlToiClient parameter must be non-null");
         }
-        this.nhlToiClient = nhlToiClient;
+        this.nhlTimeOnIceClient = nhlTimeOnIceClient;
     }
 
     public Document getToiReportForGame(final int gameId, final Team team) {
@@ -26,7 +26,7 @@ public class NhlTimeOnIceProxy {
         final String season = getSeasonFromGameId(gameId);
         final String teamAbbreviation = team.getLabel();
         final String game = getGameFromGameId(gameId);
-        final Document toiReport = nhlToiClient.getTeamToiReportForGame(season, teamAbbreviation, game);
+        final Document toiReport = nhlTimeOnIceClient.getTeamToiReportForGame(season, teamAbbreviation, game);
         return toiReport;
     }
 
