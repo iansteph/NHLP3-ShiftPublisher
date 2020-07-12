@@ -1,26 +1,25 @@
 package iansteph.nhlp3.shiftpublisher.model.toi.player;
 
-import java.time.Duration;
 import java.util.Objects;
 
 public class Shift {
 
-    private Integer shiftNumber;
+    private int shiftNumber;
     private String period;
-    private Duration shiftStartElapsedTime;
-    private Duration shiftStartGameClockTime;
-    private Duration shiftEndElapsedTime;
-    private Duration shiftEndGameClockTime;
-    private Duration shiftDuration;
+    private int shiftStartElapsedTimeInSeconds;
+    private int shiftStartGameClockTimeInSeconds;
+    private int shiftEndElapsedTimeInSeconds;
+    private int shiftEndGameClockTimeInSeconds;
+    private int shiftDurationInSeconds;
     private Boolean hasPenaltyDuringShift;
     private Boolean hasGoalDuringShift;
 
-    public Integer getShiftNumber() {
+    public int getShiftNumber() {
 
         return shiftNumber;
     }
 
-    public void setShiftNumber(final Integer shiftNumber) {
+    public void setShiftNumber(final int shiftNumber) {
 
         this.shiftNumber = shiftNumber;
     }
@@ -35,54 +34,54 @@ public class Shift {
         this.period = period;
     }
 
-    public Duration getShiftStartElapsedTime() {
+    public int getShiftStartElapsedTimeInSeconds() {
 
-        return shiftStartElapsedTime;
+        return shiftStartElapsedTimeInSeconds;
     }
 
-    public void setShiftStartElapsedTime(final Duration shiftStartElapsedTime) {
+    public void setShiftStartElapsedTimeInSeconds(final int shiftStartElapsedTimeInSeconds) {
 
-        this.shiftStartElapsedTime = shiftStartElapsedTime;
+        this.shiftStartElapsedTimeInSeconds = shiftStartElapsedTimeInSeconds;
     }
 
-    public Duration getShiftStartGameClockTime() {
+    public int getShiftStartGameClockTimeInSeconds() {
 
-        return shiftStartGameClockTime;
+        return shiftStartGameClockTimeInSeconds;
     }
 
-    public void setShiftStartGameClockTime(final Duration shiftStartGameClockTime) {
+    public void setShiftStartGameClockTimeInSeconds(final int shiftStartGameClockTimeInSeconds) {
 
-        this.shiftStartGameClockTime = shiftStartGameClockTime;
+        this.shiftStartGameClockTimeInSeconds = shiftStartGameClockTimeInSeconds;
     }
 
-    public Duration getShiftEndElapsedTime() {
+    public int getShiftEndElapsedTimeInSeconds() {
 
-        return shiftEndElapsedTime;
+        return shiftEndElapsedTimeInSeconds;
     }
 
-    public void setShiftEndElapsedTime(final Duration shiftEndElapsedTime) {
+    public void setShiftEndElapsedTimeInSeconds(final int shiftEndElapsedTimeInSeconds) {
 
-        this.shiftEndElapsedTime = shiftEndElapsedTime;
+        this.shiftEndElapsedTimeInSeconds = shiftEndElapsedTimeInSeconds;
     }
 
-    public Duration getShiftEndGameClockTime() {
+    public int getShiftEndGameClockTimeInSeconds() {
 
-        return shiftEndGameClockTime;
+        return shiftEndGameClockTimeInSeconds;
     }
 
-    public void setShiftEndGameClockTime(final Duration shiftEndGameClockTime) {
+    public void setShiftEndGameClockTimeInSeconds(final int shiftEndGameClockTimeInSeconds) {
 
-        this.shiftEndGameClockTime = shiftEndGameClockTime;
+        this.shiftEndGameClockTimeInSeconds = shiftEndGameClockTimeInSeconds;
     }
 
-    public Duration getShiftDuration() {
+    public int getShiftDurationInSeconds() {
 
-        return shiftDuration;
+        return shiftDurationInSeconds;
     }
 
-    public void setShiftDuration(final Duration shiftDuration) {
+    public void setShiftDurationInSeconds(final int shiftDurationInSeconds) {
 
-        this.shiftDuration = shiftDuration;
+        this.shiftDurationInSeconds = shiftDurationInSeconds;
     }
 
     public Boolean getHasPenaltyDuringShift() {
@@ -111,11 +110,11 @@ public class Shift {
         return "Shift{" +
                 "shiftNumber=" + shiftNumber +
                 ", period='" + period + '\'' +
-                ", shiftStartElapsedTime=" + shiftStartElapsedTime +
-                ", shiftStartGameClockTime=" + shiftStartGameClockTime +
-                ", shiftEndElapsedTime=" + shiftEndElapsedTime +
-                ", shiftEndGameClockTime=" + shiftEndGameClockTime +
-                ", shiftDuration=" + shiftDuration +
+                ", shiftStartElapsedTimeInSeconds=" + shiftStartElapsedTimeInSeconds +
+                ", shiftStartGameClockTimeInSeconds=" + shiftStartGameClockTimeInSeconds +
+                ", shiftEndElapsedTimeInSeconds=" + shiftEndElapsedTimeInSeconds +
+                ", shiftEndGameClockTimeInSeconds=" + shiftEndGameClockTimeInSeconds +
+                ", shiftDurationInSeconds=" + shiftDurationInSeconds +
                 ", hasPenaltyDuringShift=" + hasPenaltyDuringShift +
                 ", hasGoalDuringShift=" + hasGoalDuringShift +
                 '}';
@@ -129,11 +128,11 @@ public class Shift {
         Shift shift = (Shift) o;
         return Objects.equals(shiftNumber, shift.shiftNumber) &&
                 Objects.equals(period, shift.period) &&
-                Objects.equals(shiftStartElapsedTime, shift.shiftStartElapsedTime) &&
-                Objects.equals(shiftStartGameClockTime, shift.shiftStartGameClockTime) &&
-                Objects.equals(shiftEndElapsedTime, shift.shiftEndElapsedTime) &&
-                Objects.equals(shiftEndGameClockTime, shift.shiftEndGameClockTime) &&
-                Objects.equals(shiftDuration, shift.shiftDuration) &&
+                Objects.equals(shiftStartElapsedTimeInSeconds, shift.shiftStartElapsedTimeInSeconds) &&
+                Objects.equals(shiftStartGameClockTimeInSeconds, shift.shiftStartGameClockTimeInSeconds) &&
+                Objects.equals(shiftEndElapsedTimeInSeconds, shift.shiftEndElapsedTimeInSeconds) &&
+                Objects.equals(shiftEndGameClockTimeInSeconds, shift.shiftEndGameClockTimeInSeconds) &&
+                Objects.equals(shiftDurationInSeconds, shift.shiftDurationInSeconds) &&
                 Objects.equals(hasPenaltyDuringShift, shift.hasPenaltyDuringShift) &&
                 Objects.equals(hasGoalDuringShift, shift.hasGoalDuringShift);
     }
@@ -141,6 +140,7 @@ public class Shift {
     @Override
     public int hashCode() {
 
-        return Objects.hash(shiftNumber, period, shiftStartElapsedTime, shiftStartGameClockTime, shiftEndElapsedTime, shiftEndGameClockTime, shiftDuration, hasPenaltyDuringShift, hasGoalDuringShift);
+        return Objects.hash(shiftNumber, period, shiftStartElapsedTimeInSeconds, shiftStartGameClockTimeInSeconds, shiftEndElapsedTimeInSeconds,
+                shiftEndGameClockTimeInSeconds, shiftDurationInSeconds, hasPenaltyDuringShift, hasGoalDuringShift);
     }
 }

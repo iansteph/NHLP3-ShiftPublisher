@@ -278,27 +278,27 @@ public class TimeOnIceReportParser {
 
                     // Shift start elapsed time
                     final Duration shiftStartElapsedTime = durationFromTextNode(rawStartOfShift[0]);
-                    shift.setShiftStartElapsedTime(shiftStartElapsedTime);
+                    shift.setShiftStartElapsedTimeInSeconds(convertDurationToSeconds(shiftStartElapsedTime));
 
                     // Shift start game clock time
                     final Duration shiftStartGameClockTime = durationFromTextNode(rawStartOfShift[1]);
-                    shift.setShiftStartGameClockTime(shiftStartGameClockTime);
+                    shift.setShiftStartGameClockTimeInSeconds(convertDurationToSeconds(shiftStartGameClockTime));
 
                     // End of shift column
                     final String[] rawEndOfShift = columns.get(3).split("/");
 
                     // Shift start elapsed time
                     final Duration endOfShiftElapsedTime = durationFromTextNode(rawEndOfShift[0]);
-                    shift.setShiftEndElapsedTime(endOfShiftElapsedTime);
+                    shift.setShiftEndElapsedTimeInSeconds(convertDurationToSeconds(endOfShiftElapsedTime));
 
                     // Shift start game clock time
                     final Duration endOfShiftGameClockTime = durationFromTextNode(rawEndOfShift[1]);
-                    shift.setShiftEndGameClockTime(endOfShiftGameClockTime);
+                    shift.setShiftEndGameClockTimeInSeconds(convertDurationToSeconds(endOfShiftGameClockTime));
 
                     // Duration
                     final String rawShiftDuration = columns.get(4);
                     final Duration shiftDuration = durationFromTextNode(rawShiftDuration);
-                    shift.setShiftDuration(shiftDuration);
+                    shift.setShiftDurationInSeconds(convertDurationToSeconds(shiftDuration));
 
                     // Event
                     final String rawEvent = columns.get(5);
@@ -347,27 +347,27 @@ public class TimeOnIceReportParser {
                         // Average Shift Length
                         final String rawAverageShiftLength = columns.get(2);
                         final Duration averageShiftLength = durationFromTextNode(rawAverageShiftLength);
-                        shiftAggregation.setAverageShiftLength(averageShiftLength);
+                        shiftAggregation.setAverageShiftLengthInSeconds(convertDurationToSeconds(averageShiftLength));
 
                         // TOI
                         final String rawTimeOnIce = columns.get(3);
                         final Duration timeOnIce = durationFromTextNode(rawTimeOnIce);
-                        shiftAggregation.setTimeOnIce(timeOnIce);
+                        shiftAggregation.setTimeOnIceInSeconds(convertDurationToSeconds(timeOnIce));
 
                         // Even strength TOI
                         final String rawEvenStrengthTimeOnIce = columns.get(4);
                         final Duration evenStrengthTimeOnIce = durationFromTextNode(rawEvenStrengthTimeOnIce);
-                        shiftAggregation.setEvenStrengthTimeOnIce(evenStrengthTimeOnIce);
+                        shiftAggregation.setEvenStrengthTimeOnIceInSeconds(convertDurationToSeconds(evenStrengthTimeOnIce));
 
                         // Power play TOI
                         final String rawPowerPlayTimeOnIce = columns.get(5);
                         final Duration powerPlaceTimeOnIce = durationFromTextNode(rawPowerPlayTimeOnIce);
-                        shiftAggregation.setPowerPlayTimeOnIce(powerPlaceTimeOnIce);
+                        shiftAggregation.setPowerPlayTimeOnIceInSeconds(convertDurationToSeconds(powerPlaceTimeOnIce));
 
                         // Shorthanded TOI
                         final String rawShortHandedTimeOnIce = columns.get(6);
                         final Duration shortHandedTimeOnice = durationFromTextNode(rawShortHandedTimeOnIce);
-                        shiftAggregation.setShortHandedTimeOnIce(shortHandedTimeOnice);
+                        shiftAggregation.setShortHandedTimeOnIceInSeconds(convertDurationToSeconds(shortHandedTimeOnice));
 
                         if (aggregationName.equals(TOTAL_SHIFT_AGGREGATION)) {
 
@@ -390,5 +390,10 @@ public class TimeOnIceReportParser {
                 .ofMinutes(Long.parseLong(durationComponents[0].trim()))
                 .plusSeconds(Long.parseLong(durationComponents[1].trim()));
         return duration;
+    }
+
+    private int convertDurationToSeconds(final Duration duration) {
+
+        return Math.toIntExact(duration.getSeconds());
     }
 }

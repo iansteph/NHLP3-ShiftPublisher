@@ -1,17 +1,16 @@
 package iansteph.nhlp3.shiftpublisher.model.toi.player.summary;
 
-import java.time.Duration;
 import java.util.Objects;
 
 public class ShiftAggregation {
 
     private String aggregationName;
-    private Integer shiftsFor;
-    private Duration averageShiftLength;
-    private Duration timeOnIce;
-    private Duration evenStrengthTimeOnIce;
-    private Duration powerPlayTimeOnIce;
-    private Duration shortHandedTimeOnIce;
+    private int shiftsFor;
+    private int averageShiftLengthInSeconds;
+    private int timeOnIceInSeconds;
+    private int evenStrengthTimeOnIceInSeconds;
+    private int powerPlayTimeOnIceInSeconds;
+    private int shortHandedTimeOnIceInSeconds;
 
     public String getAggregationName() {
 
@@ -23,64 +22,64 @@ public class ShiftAggregation {
         this.aggregationName = aggregationName;
     }
 
-    public Integer getShiftsFor() {
+    public int getShiftsFor() {
 
         return shiftsFor;
     }
 
-    public void setShiftsFor(final Integer shiftsFor) {
+    public void setShiftsFor(final int shiftsFor) {
 
         this.shiftsFor = shiftsFor;
     }
 
-    public Duration getAverageShiftLength() {
+    public int getAverageShiftLengthInSeconds() {
 
-        return averageShiftLength;
+        return averageShiftLengthInSeconds;
     }
 
-    public void setAverageShiftLength(final Duration averageShiftLength) {
+    public void setAverageShiftLengthInSeconds(final int averageShiftLengthInSeconds) {
 
-        this.averageShiftLength = averageShiftLength;
+        this.averageShiftLengthInSeconds = averageShiftLengthInSeconds;
     }
 
-    public Duration getTimeOnIce() {
+    public int getTimeOnIceInSeconds() {
 
-        return timeOnIce;
+        return timeOnIceInSeconds;
     }
 
-    public void setTimeOnIce(final Duration timeOnIce) {
+    public void setTimeOnIceInSeconds(final int timeOnIceInSeconds) {
 
-        this.timeOnIce = timeOnIce;
+        this.timeOnIceInSeconds = timeOnIceInSeconds;
     }
 
-    public Duration getEvenStrengthTimeOnIce() {
+    public int getEvenStrengthTimeOnIceInSeconds() {
 
-        return evenStrengthTimeOnIce;
+        return evenStrengthTimeOnIceInSeconds;
     }
 
-    public void setEvenStrengthTimeOnIce(final Duration evenStrengthTimeOnIce) {
+    public void setEvenStrengthTimeOnIceInSeconds(final int evenStrengthTimeOnIceInSeconds) {
 
-        this.evenStrengthTimeOnIce = evenStrengthTimeOnIce;
+        this.evenStrengthTimeOnIceInSeconds = evenStrengthTimeOnIceInSeconds;
     }
 
-    public Duration getPowerPlayTimeOnIce() {
+    public int getPowerPlayTimeOnIceInSeconds() {
 
-        return powerPlayTimeOnIce;
+        return powerPlayTimeOnIceInSeconds;
     }
 
-    public void setPowerPlayTimeOnIce(final Duration powerPlayTimeOnIce) {
+    public void setPowerPlayTimeOnIceInSeconds(final int powerPlayTimeOnIceInSeconds) {
 
-        this.powerPlayTimeOnIce = powerPlayTimeOnIce;
+        this.powerPlayTimeOnIceInSeconds = powerPlayTimeOnIceInSeconds;
     }
 
-    public Duration getShortHandedTimeOnIce() {
+    public int getShortHandedTimeOnIceInSeconds() {
 
-        return shortHandedTimeOnIce;
+        return shortHandedTimeOnIceInSeconds;
     }
 
-    public void setShortHandedTimeOnIce(final Duration shortHandedTimeOnIce) {
+    public void setShortHandedTimeOnIceInSeconds(final int shortHandedTimeOnIceInSeconds) {
 
-        this.shortHandedTimeOnIce = shortHandedTimeOnIce;
+        this.shortHandedTimeOnIceInSeconds = shortHandedTimeOnIceInSeconds;
     }
 
     @Override
@@ -89,11 +88,11 @@ public class ShiftAggregation {
         return "ShiftAggregation{" +
                 "aggregationName='" + aggregationName + '\'' +
                 ", shiftsFor=" + shiftsFor +
-                ", averageShiftLength=" + averageShiftLength +
-                ", timeOnIce=" + timeOnIce +
-                ", evenStrengthTimeOnIce=" + evenStrengthTimeOnIce +
-                ", powerPlayTimeOnIce=" + powerPlayTimeOnIce +
-                ", shortHandedTimeOnIce=" + shortHandedTimeOnIce +
+                ", averageShiftLengthInSeconds=" + averageShiftLengthInSeconds +
+                ", timeOnIceInSeconds=" + timeOnIceInSeconds +
+                ", evenStrengthTimeOnIceInSeconds=" + evenStrengthTimeOnIceInSeconds +
+                ", powerPlayTimeOnIceInSeconds=" + powerPlayTimeOnIceInSeconds +
+                ", shortHandedTimeOnIceInSeconds=" + shortHandedTimeOnIceInSeconds +
                 '}';
     }
 
@@ -105,16 +104,17 @@ public class ShiftAggregation {
         ShiftAggregation that = (ShiftAggregation) o;
         return Objects.equals(aggregationName, that.aggregationName) &&
                 Objects.equals(shiftsFor, that.shiftsFor) &&
-                Objects.equals(averageShiftLength, that.averageShiftLength) &&
-                Objects.equals(timeOnIce, that.timeOnIce) &&
-                Objects.equals(evenStrengthTimeOnIce, that.evenStrengthTimeOnIce) &&
-                Objects.equals(powerPlayTimeOnIce, that.powerPlayTimeOnIce) &&
-                Objects.equals(shortHandedTimeOnIce, that.shortHandedTimeOnIce);
+                Objects.equals(averageShiftLengthInSeconds, that.averageShiftLengthInSeconds) &&
+                Objects.equals(timeOnIceInSeconds, that.timeOnIceInSeconds) &&
+                Objects.equals(evenStrengthTimeOnIceInSeconds, that.evenStrengthTimeOnIceInSeconds) &&
+                Objects.equals(powerPlayTimeOnIceInSeconds, that.powerPlayTimeOnIceInSeconds) &&
+                Objects.equals(shortHandedTimeOnIceInSeconds, that.shortHandedTimeOnIceInSeconds);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(aggregationName, shiftsFor, averageShiftLength, timeOnIce, evenStrengthTimeOnIce, powerPlayTimeOnIce, shortHandedTimeOnIce);
+        return Objects.hash(aggregationName, shiftsFor, averageShiftLengthInSeconds, timeOnIceInSeconds, evenStrengthTimeOnIceInSeconds,
+                powerPlayTimeOnIceInSeconds, shortHandedTimeOnIceInSeconds);
     }
 }

@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -127,13 +126,12 @@ public class TimeOnIceReportParserTest {
                         .collect(Collectors.toList()).get(0);
                 assertThat(match.getAggregationName(), is(key));
                 assertThat(match.getShiftsFor(), is(shifts.size()));
-                final Duration sum = shifts.stream()
-                        .map(Shift::getShiftDuration)
-                        .reduce(Duration::plus).get();
-                assertThat(match.getTimeOnIce(), is(sum));
-                final Duration average = sum.dividedBy(shifts.size());
-                final Duration differenceWithMillisecondError = average.minus(match.getAverageShiftLength());
-                assertTrue(differenceWithMillisecondError.toMillis() < 1000);
+                final int sum = shifts.stream()
+                        .mapToInt(Shift::getShiftDurationInSeconds)
+                        .sum();
+                assertThat(match.getTimeOnIceInSeconds(), is(sum));
+                final int average = sum / shifts.size();
+                assertThat(match.getAverageShiftLengthInSeconds(), is(average));
             });
         });
     }
@@ -142,9 +140,9 @@ public class TimeOnIceReportParserTest {
 
         assertTrue(shift.getShiftNumber() > 0);
         assertThat(shift.getPeriod(), is(notNullValue()));
-        assertTrue(shift.getShiftStartElapsedTime().compareTo(shift.getShiftEndElapsedTime()) <= 0);
-        assertTrue(shift.getShiftStartGameClockTime().compareTo(shift.getShiftEndGameClockTime()) >= 0);
-        assertFalse(shift.getShiftDuration().isNegative());
+        assertTrue(shift.getShiftStartElapsedTimeInSeconds() <= shift.getShiftEndElapsedTimeInSeconds());
+        assertTrue(shift.getShiftStartGameClockTimeInSeconds() >= shift.getShiftEndGameClockTimeInSeconds());
+        assertTrue(shift.getShiftDurationInSeconds() > 0);
         assertThat(shift.getHasGoalDuringShift(), is(notNullValue()));
         assertThat(shift.getHasPenaltyDuringShift(), is(notNullValue()));
     }
@@ -153,25 +151,25 @@ public class TimeOnIceReportParserTest {
 
         assertThat(totals.getAggregationName(), is("TOT"));
         assertTrue(totals.getShiftsFor() >= 0);
-        assertFalse(totals.getAverageShiftLength().isNegative());
-        assertFalse(totals.getTimeOnIce().isNegative());
-        assertFalse(totals.getEvenStrengthTimeOnIce().isNegative());
-        assertFalse(totals.getPowerPlayTimeOnIce().isNegative());
-        assertFalse(totals.getShortHandedTimeOnIce().isNegative());
+        assertTrue(totals.getAverageShiftLengthInSeconds() >= 0);
+        assertTrue(totals.getTimeOnIceInSeconds() >= 0);
+        assertTrue(totals.getEvenStrengthTimeOnIceInSeconds() >= 0);
+        assertTrue(totals.getPowerPlayTimeOnIceInSeconds() >= 0);
+        assertTrue(totals.getShortHandedTimeOnIceInSeconds() >= 0);
     }
 
     private void verifyShiftAggregation(final ShiftAggregation totals, final ShiftAggregation shiftAggregation) {
 
         assertThat(shiftAggregation.getAggregationName(), is(notNullValue()));
         assertTrue(shiftAggregation.getShiftsFor() <= totals.getShiftsFor());
-        assertFalse(shiftAggregation.getAverageShiftLength().isNegative());
-        assertTrue(shiftAggregation.getTimeOnIce().compareTo(totals.getTimeOnIce()) <= 0);
-        assertTrue(shiftAggregation.getEvenStrengthTimeOnIce().compareTo(totals.getEvenStrengthTimeOnIce()) <= 0);
-        assertTrue(shiftAggregation.getPowerPlayTimeOnIce().compareTo(totals.getPowerPlayTimeOnIce()) <= 0);
-        assertTrue(shiftAggregation.getShortHandedTimeOnIce().compareTo(totals.getShortHandedTimeOnIce()) <= 0);
-        final Duration sum = shiftAggregation.getEvenStrengthTimeOnIce()
-                .plus(shiftAggregation.getPowerPlayTimeOnIce())
-                .plus(shiftAggregation.getShortHandedTimeOnIce());
-        assertThat(shiftAggregation.getTimeOnIce(), is(sum));
+        assertTrue(shiftAggregation.getAverageShiftLengthInSeconds() >= 0);
+        assertTrue(shiftAggregation.getTimeOnIceInSeconds() <= totals.getTimeOnIceInSeconds());
+        assertTrue(shiftAggregation.getEvenStrengthTimeOnIceInSeconds() <= totals.getEvenStrengthTimeOnIceInSeconds());
+        assertTrue(shiftAggregation.getPowerPlayTimeOnIceInSeconds() <= totals.getPowerPlayTimeOnIceInSeconds());
+        assertTrue(shiftAggregation.getShortHandedTimeOnIceInSeconds() <= totals.getShortHandedTimeOnIceInSeconds());
+        final int sum = shiftAggregation.getEvenStrengthTimeOnIceInSeconds() +
+                shiftAggregation.getPowerPlayTimeOnIceInSeconds() +
+                shiftAggregation.getShortHandedTimeOnIceInSeconds();
+        assertThat(shiftAggregation.getTimeOnIceInSeconds(), is(sum));
     }
 }
