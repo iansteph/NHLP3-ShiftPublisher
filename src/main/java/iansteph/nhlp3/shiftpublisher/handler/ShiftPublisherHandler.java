@@ -40,8 +40,6 @@ import static java.lang.String.format;
 public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherRequest, Object> {
 
     private final DynamoDbProxy dynamoDbProxy;
-    private final JsoupWrapper jsoupWrapper;
-    private final NhlTimeOnIceClient nhlTimeOnIceClient;
     private final NhlTimeOnIceProxy nhlTimeOnIceProxy;
     private final SnsProxy snsProxy;
     private final TimeOnIceReportParser timeOnIceReportParser;
@@ -59,8 +57,8 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
                 .region(Region.US_EAST_1)
                 .build();
         this.dynamoDbProxy = new DynamoDbProxy(dynamoDbClient);
-        this.jsoupWrapper = new JsoupWrapper();
-        this.nhlTimeOnIceClient = new NhlTimeOnIceClient(jsoupWrapper);
+        final JsoupWrapper jsoupWrapper = new JsoupWrapper();
+        final NhlTimeOnIceClient nhlTimeOnIceClient = new NhlTimeOnIceClient(jsoupWrapper);
         this.nhlTimeOnIceProxy = new NhlTimeOnIceProxy(nhlTimeOnIceClient);
         final ObjectMapper objectMapper = new ObjectMapper();
         final SnsClient snsClient = SnsClient.builder()
@@ -75,15 +73,11 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
 
     public ShiftPublisherHandler(
             final DynamoDbProxy dynamoDbProxy,
-            final JsoupWrapper jsoupWrapper,
-            final NhlTimeOnIceClient nhlTimeOnIceClient,
             final NhlTimeOnIceProxy nhlTimeOnIceProxy,
             final SnsProxy snsProxy,
             final TimeOnIceReportParser timeOnIceReportParser
     ) {
         this.dynamoDbProxy = dynamoDbProxy;
-        this.jsoupWrapper = jsoupWrapper;
-        this.nhlTimeOnIceClient = nhlTimeOnIceClient;
         this.nhlTimeOnIceProxy = nhlTimeOnIceProxy;
         this.snsProxy = snsProxy;
         this.timeOnIceReportParser = timeOnIceReportParser;
@@ -93,9 +87,12 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
 
         final int gameId = shiftPublisherRequest.getGameId();
         final Map<String, Map<String, Integer>> shiftPublishingRecord = dynamoDbProxy.getShiftPublishingRecordForGameId(gameId);
-        final List<ShiftEvent> visitorShiftsToPublish = retrieveShiftsToPublishForTeam(gameId, Team.VISITOR, shiftPublishingRecord);
-        final List<ShiftEvent> homeShiftsToPublish = retrieveShiftsToPublishForTeam(gameId, Team.HOME, shiftPublishingRecord);
+        final TimeOnIceReport visitorTimeOnIceReport = retrieveTimeOnIceReport(gameId, Team.VISITOR);
+        final List<ShiftEvent> visitorShiftsToPublish = retrieveShiftsToPublishForTeam(Team.VISITOR, visitorTimeOnIceReport, shiftPublishingRecord);
+        final TimeOnIceReport homeTimeOnIceReport = retrieveTimeOnIceReport(gameId, Team.HOME);
+        final List<ShiftEvent> homeShiftsToPublish = retrieveShiftsToPublishForTeam(Team.HOME, homeTimeOnIceReport, shiftPublishingRecord);
         Arrays.asList(visitorShiftsToPublish, homeShiftsToPublish).forEach(snsProxy::publishShiftEvents);
+        dynamoDbProxy.putShiftPublishingRecord(gameId,  visitorTimeOnIceReport, homeTimeOnIceReport);
         return HttpStatusCode.OK;
     }
 
@@ -149,12 +146,10 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
     }
 
     private List<ShiftEvent> retrieveShiftsToPublishForTeam(
-            final int gameId,
             final Team team,
+            final TimeOnIceReport teamTimeOnIceReport,
             final Map<String, Map<String, Integer>> shiftPublishingRecord
     ) {
-        final Document rawTeamTimeOnIceReport = nhlTimeOnIceProxy.getToiReportForGame(gameId, team);
-        final TimeOnIceReport teamTimeOnIceReport = timeOnIceReportParser.parse(rawTeamTimeOnIceReport);
         final String teamKey = team.getLabel().equals("V") ? "visitor" : "home";
         final Map<String, Integer> teamShiftPublishingRecord = shiftPublishingRecord.get(teamKey);
         final Map<String, List<ShiftEvent>> shiftsToPublish = retrieveShiftsToPublishFromTimeOnIceReport(teamTimeOnIceReport, teamShiftPublishingRecord);
@@ -162,6 +157,13 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
                 .flatMap(stringListEntry -> stringListEntry.getValue().stream())
                 .collect(Collectors.toList());
         return shiftEventsToPublish;
+    }
+
+    private TimeOnIceReport retrieveTimeOnIceReport(final int gameId, final Team team) {
+
+        final Document rawTeamTimeOnIceReport = nhlTimeOnIceProxy.getToiReportForGame(gameId, team);
+        final TimeOnIceReport teamTimeOnIceReport = timeOnIceReportParser.parse(rawTeamTimeOnIceReport);
+        return teamTimeOnIceReport;
     }
 
     private ShiftEvent buildShiftEvent(final PlayerTimeOnIceReport playerTimeOnIceReport, final Shift shift) {
