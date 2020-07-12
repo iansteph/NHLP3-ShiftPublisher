@@ -16,7 +16,7 @@ public class SnsProxy {
     private final SnsClient snsClient;
 
     private static final Logger LOGGER = LogManager.getLogger(SnsProxy.class);
-    private static final String TOPIC_ARN = "";
+    private static final String TOPIC_ARN = "arn:aws:sns:us-east-1:627812672245:NHLP3-Shift-Events";
 
 
     public SnsProxy(final ObjectMapper objectMapper, final SnsClient snsClient) {
