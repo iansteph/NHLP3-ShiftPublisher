@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 public class DynamoDbProxyTest {
 
-    private static final String TABLE_NAME = "prod-NhlPlayByPlayProcessingAggregate";
+    private static final String TABLE_NAME = "NHLP3-Aggregate";
     private static final String TABLE_PARTITION_KEY_ATTRIBUTE_NAME = "PK";
     private static final String TABLE_SORT_KEY_ATTRIBUTE_NAME = "SK";
     private static final String TABLE_SHIFT_PUBLISHING_RECORD_ATTRIBUTE_NAME = "shiftPublishingRecord";
