@@ -35,7 +35,7 @@ public class DynamoDbProxy {
         try {
 
             final Map<String, AttributeValue> primaryKey = new HashMap<>();
-            final String key = format("SHIFTPUBLISHING-%d", gameId);
+            final String key = format("SHIFTPUBLISHING#%d", gameId);
             primaryKey.put(TABLE_PARTITION_KEY_ATTRIBUTE_NAME, AttributeValue.builder().s(key).build());
             primaryKey.put(TABLE_SORT_KEY_ATTRIBUTE_NAME, AttributeValue.builder().s(key).build());
             final GetItemRequest getItemRequest = GetItemRequest.builder()
@@ -62,7 +62,7 @@ public class DynamoDbProxy {
     ) {
         try {
 
-            final String key = format("SHIFTPUBLISHING-%d", gameId);
+            final String key = format("SHIFTPUBLISHING#%d", gameId);
             final Map<String, AttributeValue> item = transformTimeOnIceReportsToDynamoDbAttribute(visitorTimeOnIceReport, homeTimeOnIceReport);
             item.put(TABLE_PARTITION_KEY_ATTRIBUTE_NAME, AttributeValue.builder().s(key).build());
             item.put(TABLE_SORT_KEY_ATTRIBUTE_NAME, AttributeValue.builder().s(key).build());

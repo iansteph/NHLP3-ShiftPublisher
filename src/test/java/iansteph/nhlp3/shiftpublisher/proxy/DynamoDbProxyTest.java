@@ -112,7 +112,7 @@ public class DynamoDbProxyTest {
         assertThat(putItemRequest.tableName(), is(TABLE_NAME));
         final Map<String, AttributeValue> item = putItemRequest.item();
         assertThat(item.size(), is(3));
-        final String key = format("SHIFTPUBLISHING-%d", gameId);
+        final String key = format("SHIFTPUBLISHING#%d", gameId);
         assertThat(item.get(TABLE_PARTITION_KEY_ATTRIBUTE_NAME).s(), is(key));
         assertThat(item.get(TABLE_SORT_KEY_ATTRIBUTE_NAME).s(), is(key));
         final AttributeValue shiftPublishingRecordAttribute = item.get(TABLE_SHIFT_PUBLISHING_RECORD_ATTRIBUTE_NAME);
