@@ -5,13 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>iansteph.nhlp3</groupId>
     <artifactId>ShiftPublisher</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-${maven.build.timestamp}</version>
     <packaging>jar</packaging>
     <name>Publishes shift information for each NHL player in each NHL game.</name>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <powermock.version>2.0.7</powermock.version>
+        <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
     </properties>
     
     <dependencyManagement>
