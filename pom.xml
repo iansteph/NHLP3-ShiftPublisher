@@ -121,6 +121,30 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            
+            <!-- Uploads the JAR with the generated timestamp to the S3 asset bucket -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>aws</executable>
+                    <arguments>
+                        <argument>s3</argument>
+                        <argument>cp</argument>
+                        <argument>./target/ShiftPublisher-1.0.0-${maven.build.timestamp}.jar</argument>
+                        <argument>s3://nhlp3-shift-publisher-artifacts/ShiftPublisher-1.0.0-${maven.build.timestamp}.jar</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
