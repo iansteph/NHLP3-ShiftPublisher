@@ -23,23 +23,25 @@ import static org.mockito.Mockito.when;
 @PrepareForTest(HttpConnection.class)
 public class JsoupWrapperTest {
 
+    public static final String WWW_NHL_COM = "http://www.nhl.com";
+
     private final Connection mockConnection = mock(Connection.class);
+    private final Document mockDocument = mock(Document.class);
     private final JsoupWrapper jsoupWrapper = new JsoupWrapper();
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
 
         PowerMockito.mockStatic(HttpConnection.class);
         when(HttpConnection.connect(anyString())).thenReturn(mockConnection);
+        when(mockDocument.html()).thenReturn(WWW_NHL_COM);
+        when(mockConnection.get()).thenReturn(mockDocument);
     }
 
     @Test
-    public void test_parseHtmlFromUrl_successfully_parses_html_from_url() throws IOException {
+    public void test_parseHtmlFromUrl_successfully_parses_html_from_url() {
 
-        when(mockConnection.get()).thenReturn(new Document("SomeBaseUri"));
-        final String url = "http://www.nhl.com";
-
-        final Document actualDocument = jsoupWrapper.parseHtmlFromUrl(url);
+        final Document actualDocument = jsoupWrapper.parseHtmlFromUrl(WWW_NHL_COM);
 
         assertThat(actualDocument, is(notNullValue()));
     }
@@ -48,8 +50,23 @@ public class JsoupWrapperTest {
     public void test_parseHtmlFromUrl_throws_exception_on_error() throws IOException {
 
         when(mockConnection.get()).thenThrow(new IOException());
-        final String url = "http://www.nhl.com";
 
-        jsoupWrapper.parseHtmlFromUrl(url);
+        jsoupWrapper.parseHtmlFromUrl(WWW_NHL_COM);
+    }
+
+    @Test
+    public void test_getRawHtmlFromUrl_successfully_gets_raw_html_from_url() {
+
+        final String rawHtml = jsoupWrapper.getRawHtmlFromUrl(WWW_NHL_COM);
+
+        assertThat(rawHtml, is(notNullValue()));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void test_getRawHtmlFromUrl_throws_exception_on_error() throws IOException {
+
+        when(mockConnection.get()).thenThrow(new IOException());
+
+        jsoupWrapper.getRawHtmlFromUrl(WWW_NHL_COM);
     }
 }

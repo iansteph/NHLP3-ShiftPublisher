@@ -3,6 +3,7 @@ package iansteph.nhlp3.shiftpublisher.client;
 import iansteph.nhlp3.shiftpublisher.client.wrapper.JsoupWrapper;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -18,7 +19,8 @@ public class NhlTimeOnIceClientTest {
     private final static String GAME = "021079";
 
     private final JsoupWrapper mockJsoupWrapper = mock(JsoupWrapper.class);
-    private final NhlTimeOnIceClient nhlTimeOnIceClient = new NhlTimeOnIceClient(mockJsoupWrapper);
+    private final S3Client mockS3Client = mock(S3Client.class);
+    private final NhlTimeOnIceClient nhlTimeOnIceClient = new NhlTimeOnIceClient(mockJsoupWrapper, mockS3Client);
 
     @Test
     public void test_getTeamToiReportForGame_successfully_retrieves_toi_report_for_game() {

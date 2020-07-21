@@ -25,6 +25,7 @@ import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.utils.AttributeMap;
 
@@ -58,7 +59,13 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
                 .build();
         this.dynamoDbProxy = new DynamoDbProxy(dynamoDbClient);
         final JsoupWrapper jsoupWrapper = new JsoupWrapper();
-        final NhlTimeOnIceClient nhlTimeOnIceClient = new NhlTimeOnIceClient(jsoupWrapper);
+        final S3Client s3Client = S3Client.builder()
+                .credentialsProvider(defaultAwsCredentialsProvider)
+                .endpointOverride(URI.create("https://s3.us-east-1.amazonaws.com/"))
+                .httpClient(httpClient)
+                .region(Region.US_EAST_1)
+                .build();
+        final NhlTimeOnIceClient nhlTimeOnIceClient = new NhlTimeOnIceClient(jsoupWrapper, s3Client);
         this.nhlTimeOnIceProxy = new NhlTimeOnIceProxy(nhlTimeOnIceClient);
         final ObjectMapper objectMapper = new ObjectMapper();
         final SnsClient snsClient = SnsClient.builder()

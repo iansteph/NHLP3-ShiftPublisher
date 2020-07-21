@@ -5,6 +5,7 @@ import iansteph.nhlp3.shiftpublisher.client.wrapper.JsoupWrapper;
 import iansteph.nhlp3.shiftpublisher.model.Team;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -24,12 +25,13 @@ public class NhlTimeOnIceProxyTest {
     private static final Team TEAM = Team.VISITOR;
 
     private final NhlTimeOnIceClient mockNhlTimeOnIceClient = mock(NhlTimeOnIceClient.class);
+    private final S3Client mockS3Client = mock(S3Client.class);
     private final NhlTimeOnIceProxy nhlTimeOnIceProxy = new NhlTimeOnIceProxy(mockNhlTimeOnIceClient);
 
     @Test
     public void test_constructor_successfully_builds_NhlToiProxy_when_non_null_NhlToiClient_provided() {
 
-        final NhlTimeOnIceClient nhlTimeOnIceClient = new NhlTimeOnIceClient(new JsoupWrapper());
+        final NhlTimeOnIceClient nhlTimeOnIceClient = new NhlTimeOnIceClient(new JsoupWrapper(), mockS3Client);
 
         try {
 
