@@ -7,6 +7,8 @@ public class TimeOnIceReport {
 
     private String visitorTeamName;
     private String homeTeamName;
+    private Integer visitorTeamId;
+    private Integer homeTeamId;
     private Integer visitorTeamScore;
     private Integer homeTeamScore;
     private Integer visitorTeamGameNumber;
@@ -40,6 +42,26 @@ public class TimeOnIceReport {
     public void setHomeTeamName(final String homeTeamName) {
 
         this.homeTeamName = homeTeamName;
+    }
+
+    public Integer getVisitorTeamId() {
+
+        return visitorTeamId;
+    }
+
+    public void setVisitorTeamId(final Integer visitorTeamId) {
+
+        this.visitorTeamId = visitorTeamId;
+    }
+
+    public Integer getHomeTeamId() {
+
+        return homeTeamId;
+    }
+
+    public void setHomeTeamId(final Integer homeTeamId) {
+
+        this.homeTeamId = homeTeamId;
     }
 
     public Integer getVisitorTeamScore() {
@@ -186,6 +208,8 @@ public class TimeOnIceReport {
         return "TimeOnIceReport{" +
                 "visitorTeamName='" + visitorTeamName + '\'' +
                 ", homeTeamName='" + homeTeamName + '\'' +
+                ", visitorTeamId='" + visitorTeamId + '\'' +
+                ", homeTeamId='" + homeTeamId + '\'' +
                 ", visitorTeamScore=" + visitorTeamScore +
                 ", homeTeamScore=" + homeTeamScore +
                 ", visitorTeamGameNumber=" + visitorTeamGameNumber +
@@ -211,6 +235,8 @@ public class TimeOnIceReport {
         TimeOnIceReport that = (TimeOnIceReport) o;
         return Objects.equals(visitorTeamName, that.visitorTeamName) &&
                 Objects.equals(homeTeamName, that.homeTeamName) &&
+                Objects.equals(visitorTeamId, that.visitorTeamId) &&
+                Objects.equals(homeTeamId, that.homeTeamId) &&
                 Objects.equals(visitorTeamScore, that.visitorTeamScore) &&
                 Objects.equals(homeTeamScore, that.homeTeamScore) &&
                 Objects.equals(visitorTeamGameNumber, that.visitorTeamGameNumber) &&
@@ -230,6 +256,6 @@ public class TimeOnIceReport {
     @Override
     public int hashCode() {
 
-        return Objects.hash(visitorTeamName, homeTeamName, visitorTeamScore, homeTeamScore, visitorTeamGameNumber, visitorTeamAwayGameNumber, homeTeamGameNumber, homeTeamHomeGameNumber, date, attendance, venueName, startTime, endTime, nhlGameNumber, gameState, playerTimeOnIceReports);
+        return Objects.hash(visitorTeamName, homeTeamName, visitorTeamId, homeTeamId, visitorTeamScore, homeTeamScore, visitorTeamGameNumber, visitorTeamAwayGameNumber, homeTeamGameNumber, homeTeamHomeGameNumber, date, attendance, venueName, startTime, endTime, nhlGameNumber, gameState, playerTimeOnIceReports);
     }
 }

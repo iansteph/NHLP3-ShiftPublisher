@@ -180,6 +180,7 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
         shiftEvent.setPlayerFirstName(playerTimeOnIceReport.getFirstName());
         shiftEvent.setPlayerLastName(playerTimeOnIceReport.getLastName());
         shiftEvent.setPlayerJerseyNumber(playerTimeOnIceReport.getNumber());
+        shiftEvent.setPlayerTeamId(playerTimeOnIceReport.getTeamId());
         shiftEvent.setShift(shift);
         return shiftEvent;
     }

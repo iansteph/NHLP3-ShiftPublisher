@@ -12,6 +12,7 @@ public class PlayerTimeOnIceReport {
     private String lastName;
     private String firstName;
     private String teamName;
+    private Integer teamId;
     private List<Shift> shifts;
     private Summary summary;
 
@@ -55,6 +56,16 @@ public class PlayerTimeOnIceReport {
         this.teamName = teamName;
     }
 
+    public Integer getTeamId() {
+
+        return teamId;
+    }
+
+    public void setTeamId(final Integer teamId) {
+
+        this.teamId = teamId;
+    }
+
     public List<Shift> getShifts() {
 
         return shifts;
@@ -83,6 +94,7 @@ public class PlayerTimeOnIceReport {
                 ", lastName='" + lastName + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", teamName='" + teamName + '\'' +
+                ", teamId='" + teamId + '\'' +
                 ", shifts=" + shifts +
                 ", summary=" + summary +
                 '}';
@@ -98,6 +110,7 @@ public class PlayerTimeOnIceReport {
                 Objects.equals(lastName, that.lastName) &&
                 Objects.equals(firstName, that.firstName) &&
                 Objects.equals(teamName, that.teamName) &&
+                Objects.equals(teamId, that.teamId) &&
                 Objects.equals(shifts, that.shifts) &&
                 Objects.equals(summary, that.summary);
     }
@@ -105,6 +118,6 @@ public class PlayerTimeOnIceReport {
     @Override
     public int hashCode() {
 
-        return Objects.hash(number, lastName, firstName, teamName, shifts, summary);
+        return Objects.hash(number, lastName, firstName, teamName, teamId, shifts, summary);
     }
 }

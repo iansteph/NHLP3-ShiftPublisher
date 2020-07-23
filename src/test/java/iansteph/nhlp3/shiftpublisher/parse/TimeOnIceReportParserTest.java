@@ -1,5 +1,6 @@
 package iansteph.nhlp3.shiftpublisher.parse;
 
+import iansteph.nhlp3.shiftpublisher.handler.NhlTeamIdMapping;
 import iansteph.nhlp3.shiftpublisher.model.toi.PlayerTimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.TimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Shift;
@@ -47,10 +48,12 @@ public class TimeOnIceReportParserTest {
         assertThat(timeOnIceReport.getGameState(), is("Final"));
         assertThat(timeOnIceReport.getVisitorTeamScore(), is(2));
         assertThat(timeOnIceReport.getVisitorTeamName(), is("COLUMBUS BLUE JACKETS"));
+        assertThat(timeOnIceReport.getVisitorTeamId(), is(29));
         assertThat(timeOnIceReport.getVisitorTeamGameNumber(), is(18));
         assertThat(timeOnIceReport.getVisitorTeamAwayGameNumber(), is(9));
         assertThat(timeOnIceReport.getHomeTeamScore(), is(3));
         assertThat(timeOnIceReport.getHomeTeamName(), is("MONTREAL CANADIENS"));
+        assertThat(timeOnIceReport.getHomeTeamId(), is(8));
         assertThat(timeOnIceReport.getHomeTeamGameNumber(), is(18));
         assertThat(timeOnIceReport.getHomeTeamHomeGameNumber(), is(9));
         verifyPlayerTimeOnIceReports(timeOnIceReport.getPlayerTimeOnIceReports());
@@ -72,10 +75,12 @@ public class TimeOnIceReportParserTest {
         assertThat(timeOnIceReport.getGameState(), is("Final"));
         assertThat(timeOnIceReport.getVisitorTeamScore(), is(3));
         assertThat(timeOnIceReport.getVisitorTeamName(), is("SAN JOSE SHARKS"));
+        assertThat(timeOnIceReport.getVisitorTeamId(), is(28));
         assertThat(timeOnIceReport.getVisitorTeamGameNumber(), is(13));
         assertThat(timeOnIceReport.getVisitorTeamAwayGameNumber(), is(6));
         assertThat(timeOnIceReport.getHomeTeamScore(), is(4));
         assertThat(timeOnIceReport.getHomeTeamName(), is("COLORADO AVALANCHE"));
+        assertThat(timeOnIceReport.getHomeTeamId(), is(21));
         assertThat(timeOnIceReport.getHomeTeamGameNumber(), is(11));
         assertThat(timeOnIceReport.getHomeTeamHomeGameNumber(), is(5));
         verifyPlayerTimeOnIceReports(timeOnIceReport.getPlayerTimeOnIceReports());
@@ -93,6 +98,8 @@ public class TimeOnIceReportParserTest {
         playerTimeOnIceReports.forEach(timeOnIceReport -> {
 
             assertThat(timeOnIceReport.getTeamName(), is(notNullValue()));
+            final int teamId = NhlTeamIdMapping.TEAM_NAME_TO_TEAM_ID_MAP.get(timeOnIceReport.getTeamName());
+            assertThat(timeOnIceReport.getTeamId(), is(teamId));
             assertThat(timeOnIceReport.getNumber(), is(notNullValue()));
             assertThat(timeOnIceReport.getFirstName(), is(notNullValue()));
             assertThat(timeOnIceReport.getLastName(), is(notNullValue()));

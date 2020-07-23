@@ -7,6 +7,7 @@ import java.util.Objects;
 public class ShiftEvent {
 
     private String playerTeamName;
+    private Integer playerTeamId;
     private String playerFirstName;
     private String playerLastName;
     private int playerJerseyNumber;
@@ -20,6 +21,16 @@ public class ShiftEvent {
     public void setPlayerTeamName(final String playerTeamName) {
 
         this.playerTeamName = playerTeamName;
+    }
+
+    public Integer getPlayerTeamId() {
+
+        return playerTeamId;
+    }
+
+    public void setPlayerTeamId(final Integer playerTeamId) {
+
+        this.playerTeamId = playerTeamId;
     }
 
     public String getPlayerFirstName() {
@@ -67,6 +78,7 @@ public class ShiftEvent {
 
         return "ShiftEvent{" +
                 "playerTeamName='" + playerTeamName + '\'' +
+                ", playerTeamId='" + playerTeamId + '\'' +
                 ", playerFirstName='" + playerFirstName + '\'' +
                 ", playerLastName='" + playerLastName + '\'' +
                 ", playerJerseyNumber=" + playerJerseyNumber +
@@ -82,6 +94,7 @@ public class ShiftEvent {
         ShiftEvent that = (ShiftEvent) o;
         return playerJerseyNumber == that.playerJerseyNumber &&
                 Objects.equals(playerTeamName, that.playerTeamName) &&
+                Objects.equals(playerTeamId, that.playerTeamId) &&
                 Objects.equals(playerFirstName, that.playerFirstName) &&
                 Objects.equals(playerLastName, that.playerLastName) &&
                 Objects.equals(shift, that.shift);
@@ -90,6 +103,6 @@ public class ShiftEvent {
     @Override
     public int hashCode() {
 
-        return Objects.hash(playerTeamName, playerFirstName, playerLastName, playerJerseyNumber, shift);
+        return Objects.hash(playerTeamName, playerTeamId, playerFirstName, playerLastName, playerJerseyNumber, shift);
     }
 }

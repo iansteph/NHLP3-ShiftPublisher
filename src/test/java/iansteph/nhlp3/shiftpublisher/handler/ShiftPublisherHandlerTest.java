@@ -64,6 +64,7 @@ public class ShiftPublisherHandlerTest {
         erikKarlsson65.setLastName("KARLSSON");
         erikKarlsson65.setNumber(65);
         erikKarlsson65.setTeamName("San Jose Sharks");
+        erikKarlsson65.setTeamId(28);
         final Shift erikKarlssonShift1 = new Shift();
         erikKarlssonShift1.setShiftNumber(1);
         final Shift erikKarlssonShift2 = new Shift();
@@ -76,6 +77,7 @@ public class ShiftPublisherHandlerTest {
         austonMatthews34.setLastName("MATTHEWS");
         austonMatthews34.setNumber(34);
         austonMatthews34.setTeamName("Toronto Maple Leafs");
+        austonMatthews34.setTeamId(10);
         final Shift austonMatthewsShift1 = new Shift();
         austonMatthewsShift1.setShiftNumber(1);
         final Shift austonMatthewsShift2 = new Shift();
@@ -94,12 +96,14 @@ public class ShiftPublisherHandlerTest {
         erikkarlsson.setPlayerLastName("KARLSSON");
         erikkarlsson.setPlayerJerseyNumber(65);
         erikkarlsson.setPlayerTeamName("San Jose Sharks");
+        erikkarlsson.setPlayerTeamId(28);
         erikkarlsson.setShift(erikKarlssonShift2);
         final ShiftEvent austonMatthews = new ShiftEvent();
         austonMatthews.setPlayerFirstName("AUSTON");
         austonMatthews.setPlayerLastName("MATTHEWS");
         austonMatthews.setPlayerJerseyNumber(34);
         austonMatthews.setPlayerTeamName("Toronto Maple Leafs");
+        austonMatthews.setPlayerTeamId(10);
         austonMatthews.setShift(austonMatthewsShift2);
 
         shiftPublisherHandler.handleRequest(shiftPublisherRequest, null);
@@ -192,6 +196,7 @@ public class ShiftPublisherHandlerTest {
         erikKarlsson65.setLastName("KARLSSON");
         erikKarlsson65.setNumber(65);
         erikKarlsson65.setTeamName("San Jose Sharks");
+        erikKarlsson65.setTeamId(28);
         final Shift erikKarlssonShift1 = new Shift();
         erikKarlssonShift1.setShiftNumber(1);
         final Shift erikKarlssonShift2 = new Shift();
@@ -204,6 +209,7 @@ public class ShiftPublisherHandlerTest {
         austonMatthews34.setLastName("MATTHEWS");
         austonMatthews34.setNumber(34);
         austonMatthews34.setTeamName("Toronto Maple Leafs");
+        austonMatthews34.setTeamId(10);
         final Shift austonMatthewsShift1 = new Shift();
         austonMatthewsShift1.setShiftNumber(1);
         final Shift austonMatthewsShift2 = new Shift();
@@ -226,12 +232,14 @@ public class ShiftPublisherHandlerTest {
         erikKarlssonShiftEvent1.setPlayerLastName(karlsson);
         erikKarlssonShiftEvent1.setPlayerJerseyNumber(sixtyFive);
         erikKarlssonShiftEvent1.setPlayerTeamName(sanJoseSharks);
+        erikKarlssonShiftEvent1.setPlayerTeamId(28);
         erikKarlssonShiftEvent1.setShift(erikKarlssonShift1);
         final ShiftEvent erikKarlssonShiftEvent2 = new ShiftEvent();
         erikKarlssonShiftEvent2.setPlayerFirstName(erik);
         erikKarlssonShiftEvent2.setPlayerLastName(karlsson);
         erikKarlssonShiftEvent2.setPlayerJerseyNumber(sixtyFive);
         erikKarlssonShiftEvent2.setPlayerTeamName(sanJoseSharks);
+        erikKarlssonShiftEvent2.setPlayerTeamId(28);
         erikKarlssonShiftEvent2.setShift(erikKarlssonShift2);
         final String auston = "AUSTON";
         final String matthews = "MATTHEWS";
@@ -242,12 +250,14 @@ public class ShiftPublisherHandlerTest {
         austonMatthewsShiftEvent1.setPlayerLastName(matthews);
         austonMatthewsShiftEvent1.setPlayerJerseyNumber(thirtyFour);
         austonMatthewsShiftEvent1.setPlayerTeamName(torontoMapleLeafs);
+        austonMatthewsShiftEvent1.setPlayerTeamId(10);
         austonMatthewsShiftEvent1.setShift(austonMatthewsShift1);
         final ShiftEvent austonMatthewsShiftEvent2 = new ShiftEvent();
         austonMatthewsShiftEvent2.setPlayerFirstName(auston);
         austonMatthewsShiftEvent2.setPlayerLastName(matthews);
         austonMatthewsShiftEvent2.setPlayerJerseyNumber(thirtyFour);
         austonMatthewsShiftEvent2.setPlayerTeamName(torontoMapleLeafs);
+        austonMatthewsShiftEvent2.setPlayerTeamId(10);
         austonMatthewsShiftEvent2.setShift(austonMatthewsShift2);
 
         shiftPublisherHandler.handleRequest(shiftPublisherRequest, null);

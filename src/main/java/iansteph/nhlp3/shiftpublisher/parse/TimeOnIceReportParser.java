@@ -1,5 +1,6 @@
 package iansteph.nhlp3.shiftpublisher.parse;
 
+import iansteph.nhlp3.shiftpublisher.handler.NhlTeamIdMapping;
 import iansteph.nhlp3.shiftpublisher.model.toi.PlayerTimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.TimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Shift;
@@ -85,6 +86,8 @@ public class TimeOnIceReportParser {
                     playerTimeOnIceReport.setShifts(shift);
                     final Summary summary = parsePlayerTimeOnIceSummary(rawTimeOnIceSummaryData);
                     playerTimeOnIceReport.setSummary(summary);
+                    final int teamId = NhlTeamIdMapping.TEAM_NAME_TO_TEAM_ID_MAP.get(teamName);
+                    playerTimeOnIceReport.setTeamId(teamId);
                     return playerTimeOnIceReport;
                 })
                 .collect(Collectors.toList());
@@ -214,11 +217,13 @@ public class TimeOnIceReportParser {
         final String[] teamGameIdentifierComponents = ((TextNode) teamGameDescription.childNode(2)).text().trim().split(" ");
         final Integer teamOverallGameNumber = Integer.parseInt(teamGameIdentifierComponents[1]);
         final Integer teamSpecificGameNumber = Integer.parseInt(teamGameIdentifierComponents[4]);
+        final int teamId = NhlTeamIdMapping.TEAM_NAME_TO_TEAM_ID_MAP.get(teamName);
 
         if (teamGameIdentifierComponents[2].equals("Away")) {
 
             timeOnIceReport.setVisitorTeamScore(teamScore);
             timeOnIceReport.setVisitorTeamName(teamName);
+            timeOnIceReport.setVisitorTeamId(teamId);
             timeOnIceReport.setVisitorTeamGameNumber(teamOverallGameNumber);
             timeOnIceReport.setVisitorTeamAwayGameNumber(teamSpecificGameNumber);
         }
@@ -226,6 +231,7 @@ public class TimeOnIceReportParser {
 
             timeOnIceReport.setHomeTeamScore(teamScore);
             timeOnIceReport.setHomeTeamName(teamName);
+            timeOnIceReport.setHomeTeamId(teamId);
             timeOnIceReport.setHomeTeamGameNumber(teamOverallGameNumber);
             timeOnIceReport.setHomeTeamHomeGameNumber(teamSpecificGameNumber);
         }
@@ -243,6 +249,8 @@ public class TimeOnIceReportParser {
 
         final PlayerTimeOnIceReport playerTimeOnIceReport = new PlayerTimeOnIceReport();
         playerTimeOnIceReport.setTeamName(teamName);
+        final int teamId = NhlTeamIdMapping.TEAM_NAME_TO_TEAM_ID_MAP.get(teamName);
+        playerTimeOnIceReport.setTeamId(teamId);
         final String[] identifiers = rawPlayerIdentifier.split(" ");
         final Integer jerseyNumber = Integer.parseInt(identifiers[0].trim());
         playerTimeOnIceReport.setNumber(jerseyNumber);
