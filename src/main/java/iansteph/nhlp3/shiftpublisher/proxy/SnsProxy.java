@@ -3,6 +3,7 @@ package iansteph.nhlp3.shiftpublisher.proxy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import iansteph.nhlp3.shiftpublisher.model.event.ShiftEvent;
+import iansteph.nhlp3.shiftpublisher.model.roster.player.Position;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.amazon.awssdk.services.sns.SnsClient;
@@ -39,6 +40,37 @@ public class SnsProxy {
                                 .dataType("Number")
                                 .stringValue(String.valueOf(shiftEvent.getPlayerTeamId()))
                                 .build();
+                        final Integer playerId = shiftEvent.getPlayerId();
+                        if (playerId != null) {
+
+                            final MessageAttributeValue playerIdMessageAttributeValue = MessageAttributeValue.builder()
+                                    .dataType("Number")
+                                    .stringValue(String.valueOf(playerId))
+                                    .build();
+                            messageAttributes.put("playerId", playerIdMessageAttributeValue);
+                        }
+                        final Position position = shiftEvent.getPlayerPosition();
+                        if (position != null) {
+
+                            final String positionType = position.getType();
+                            if (positionType != null) {
+
+                                final MessageAttributeValue positionTypeMessageAttributeValue = MessageAttributeValue.builder()
+                                        .dataType("String")
+                                        .stringValue(position.getType())
+                                        .build();
+                                messageAttributes.put("positionType", positionTypeMessageAttributeValue);
+                            }
+                            final String positionCode = position.getCode();
+                            if (positionCode != null) {
+
+                                final MessageAttributeValue positionCodeMessageAttributeValue = MessageAttributeValue.builder()
+                                        .dataType("String")
+                                        .stringValue(position.getCode())
+                                        .build();
+                                messageAttributes.put("positionCode", positionCodeMessageAttributeValue);
+                            }
+                        }
                         messageAttributes.put("teamId", teamIdMessageAttributeValue);
                         final PublishRequest publishRequest = PublishRequest.builder()
                                 .topicArn(TOPIC_ARN)
