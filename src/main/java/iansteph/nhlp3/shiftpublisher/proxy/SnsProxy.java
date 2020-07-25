@@ -54,7 +54,8 @@ public class SnsProxy {
 
         try {
 
-            return objectMapper.writeValueAsString(shiftEvent);
+            final String serializedShiftEvent = objectMapper.writeValueAsString(shiftEvent);
+            return serializedShiftEvent;
         }
         catch (final JsonProcessingException e) {
 

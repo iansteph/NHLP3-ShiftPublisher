@@ -1,11 +1,15 @@
 package iansteph.nhlp3.shiftpublisher.parse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import iansteph.nhlp3.shiftpublisher.handler.NhlTeamIdMapping;
+import iansteph.nhlp3.shiftpublisher.model.roster.Player;
+import iansteph.nhlp3.shiftpublisher.model.roster.Roster;
 import iansteph.nhlp3.shiftpublisher.model.toi.PlayerTimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.TimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Shift;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Summary;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.summary.ShiftAggregation;
+import iansteph.nhlp3.shiftpublisher.proxy.NhlDataProxy;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
@@ -23,18 +27,26 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TimeOnIceReportParserTest {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final String REGULAR_SEASON_VISITOR_GAME_ROSTER_TEST_RESOURCE = "src/test/resources/TV020273-roster.json";
     private static final String REGULAR_SEASON_VISITOR_GAME_TOI_REPORT_TEST_RESOURCE = "src/test/resources/TV020273.HTM";
+    private static final String PLAYOFF_HOME_GAME_ROSTER_TEST_RESOURCE = "src/test/resources/TH030246-roster.json";
     private static final String PLAYOFF_HOME_GAME_TOI_REPORT_TEST_RESOURCE = "src/test/resources/TH030246.HTM";
 
-    private final TimeOnIceReportParser timeOnIceReportParser = new TimeOnIceReportParser();
-
+    private final NhlDataProxy mockNhlDataProxy = mock(NhlDataProxy.class);
+    private final TimeOnIceReportParser timeOnIceReportParser = new TimeOnIceReportParser(mockNhlDataProxy);
 
     @Test
     public void test_parse_successfully_parses_time_on_ice_report_for_a_given_team_and_regular_season_gameId() throws IOException {
 
+        final Roster roster = parseTestResourceIntoRoster(REGULAR_SEASON_VISITOR_GAME_ROSTER_TEST_RESOURCE);
+        when(mockNhlDataProxy.getRosterForTeamId(anyInt())).thenReturn(roster);
         final Document document = loadTestResourceAsDocumentFromFile(REGULAR_SEASON_VISITOR_GAME_TOI_REPORT_TEST_RESOURCE);
 
         final TimeOnIceReport timeOnIceReport = timeOnIceReportParser.parse(document);
@@ -62,6 +74,8 @@ public class TimeOnIceReportParserTest {
     @Test
     public void test_parse_successfully_parses_time_on_ice_report_for_a_given_team_and_playoff_gameId() throws IOException {
 
+        final Roster roster = parseTestResourceIntoRoster(PLAYOFF_HOME_GAME_ROSTER_TEST_RESOURCE);
+        when(mockNhlDataProxy.getRosterForTeamId(anyInt())).thenReturn(roster);
         final Document document = loadTestResourceAsDocumentFromFile(PLAYOFF_HOME_GAME_TOI_REPORT_TEST_RESOURCE);
 
         final TimeOnIceReport timeOnIceReport = timeOnIceReportParser.parse(document);
@@ -91,6 +105,13 @@ public class TimeOnIceReportParserTest {
         final File testResource = new File(fileName);
         final Document testDocument = Jsoup.parse(testResource, "UTF-8");
         return testDocument;
+    }
+
+    private Roster parseTestResourceIntoRoster(final String filename) throws IOException {
+
+        final File testResource = new File(filename);
+        final Roster roster = OBJECT_MAPPER.readValue(testResource, Roster.class);
+        return roster;
     }
 
     private void verifyPlayerTimeOnIceReports(final List<PlayerTimeOnIceReport> playerTimeOnIceReports) {
@@ -140,6 +161,7 @@ public class TimeOnIceReportParserTest {
                 final int average = sum / shifts.size();
                 assertThat(match.getAverageShiftLengthInSeconds(), is(average));
             });
+            verifyPlayer(timeOnIceReport.getPlayer());
         });
     }
 
@@ -178,5 +200,12 @@ public class TimeOnIceReportParserTest {
                 shiftAggregation.getPowerPlayTimeOnIceInSeconds() +
                 shiftAggregation.getShortHandedTimeOnIceInSeconds();
         assertThat(shiftAggregation.getTimeOnIceInSeconds(), is(sum));
+    }
+
+    private void verifyPlayer(final Player player) {
+
+        assertThat(player.getJerseyNumber(), is(notNullValue()));
+        assertThat(player.getPerson(), is(notNullValue()));
+        assertThat(player.getPosition(), is(notNullValue()));
     }
 }

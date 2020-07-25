@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,6 +68,7 @@ public class SnsProxyTest {
 
         snsProxy.publishShiftEvents(shiftEvents);
 
-        verify(mockObjectMapper, times(1)).writeValueAsString(any(ShiftEvent.class));
+        verify(mockObjectMapper, times(0)).writeValueAsString(any(ShiftEvent.class));
+        verify(mockSnsClient, never()).publish(any(PublishRequest.class));
     }
 }

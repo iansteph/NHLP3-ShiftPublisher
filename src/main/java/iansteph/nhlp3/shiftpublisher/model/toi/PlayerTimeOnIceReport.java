@@ -1,5 +1,6 @@
 package iansteph.nhlp3.shiftpublisher.model.toi;
 
+import iansteph.nhlp3.shiftpublisher.model.roster.Player;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Shift;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Summary;
 
@@ -11,6 +12,7 @@ public class PlayerTimeOnIceReport {
     private Integer number;
     private String lastName;
     private String firstName;
+    private Player player;
     private String teamName;
     private Integer teamId;
     private List<Shift> shifts;
@@ -44,6 +46,16 @@ public class PlayerTimeOnIceReport {
     public void setFirstName(final String firstName) {
 
         this.firstName = firstName;
+    }
+
+    public Player getPlayer() {
+
+        return player;
+    }
+
+    public void setPlayer(final Player player) {
+
+        this.player = player;
     }
 
     public String getTeamName() {
@@ -93,6 +105,7 @@ public class PlayerTimeOnIceReport {
                 "number=" + number +
                 ", lastName='" + lastName + '\'' +
                 ", firstName='" + firstName + '\'' +
+                ", player='" + player + '\'' +
                 ", teamName='" + teamName + '\'' +
                 ", teamId='" + teamId + '\'' +
                 ", shifts=" + shifts +
@@ -109,6 +122,7 @@ public class PlayerTimeOnIceReport {
         return Objects.equals(number, that.number) &&
                 Objects.equals(lastName, that.lastName) &&
                 Objects.equals(firstName, that.firstName) &&
+                Objects.equals(player, that.player) &&
                 Objects.equals(teamName, that.teamName) &&
                 Objects.equals(teamId, that.teamId) &&
                 Objects.equals(shifts, that.shifts) &&
@@ -118,6 +132,6 @@ public class PlayerTimeOnIceReport {
     @Override
     public int hashCode() {
 
-        return Objects.hash(number, lastName, firstName, teamName, teamId, shifts, summary);
+        return Objects.hash(number, lastName, firstName, player, teamName, teamId, shifts, summary);
     }
 }

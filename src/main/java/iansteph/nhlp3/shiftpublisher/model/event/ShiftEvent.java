@@ -1,5 +1,6 @@
 package iansteph.nhlp3.shiftpublisher.model.event;
 
+import iansteph.nhlp3.shiftpublisher.model.roster.player.Position;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Shift;
 
 import java.util.Objects;
@@ -10,6 +11,8 @@ public class ShiftEvent {
     private Integer playerTeamId;
     private String playerFirstName;
     private String playerLastName;
+    private Integer playerId;
+    private Position playerPosition;
     private int playerJerseyNumber;
     private Shift shift;
 
@@ -53,6 +56,26 @@ public class ShiftEvent {
         this.playerLastName = playerLastName;
     }
 
+    public Integer getPlayerId() {
+
+        return playerId;
+    }
+
+    public void setPlayerId(final Integer playerId) {
+
+        this.playerId = playerId;
+    }
+
+    public Position getPlayerPosition() {
+
+        return playerPosition;
+    }
+
+    public void setPlayerPosition(final Position playerPosition) {
+
+        this.playerPosition = playerPosition;
+    }
+
     public int getPlayerJerseyNumber() {
 
         return playerJerseyNumber;
@@ -81,6 +104,8 @@ public class ShiftEvent {
                 ", playerTeamId='" + playerTeamId + '\'' +
                 ", playerFirstName='" + playerFirstName + '\'' +
                 ", playerLastName='" + playerLastName + '\'' +
+                ", playerId='" + playerId + '\'' +
+                ", playerPosition='" + playerPosition + '\'' +
                 ", playerJerseyNumber=" + playerJerseyNumber +
                 ", shift=" + shift +
                 '}';
@@ -97,12 +122,14 @@ public class ShiftEvent {
                 Objects.equals(playerTeamId, that.playerTeamId) &&
                 Objects.equals(playerFirstName, that.playerFirstName) &&
                 Objects.equals(playerLastName, that.playerLastName) &&
+                Objects.equals(playerId, that.playerId) &&
+                Objects.equals(playerPosition, that.playerPosition) &&
                 Objects.equals(shift, that.shift);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(playerTeamName, playerTeamId, playerFirstName, playerLastName, playerJerseyNumber, shift);
+        return Objects.hash(playerTeamName, playerTeamId, playerFirstName, playerLastName, playerId, playerPosition, playerJerseyNumber, shift);
     }
 }

@@ -1,11 +1,14 @@
 package iansteph.nhlp3.shiftpublisher.parse;
 
 import iansteph.nhlp3.shiftpublisher.handler.NhlTeamIdMapping;
+import iansteph.nhlp3.shiftpublisher.model.roster.Player;
+import iansteph.nhlp3.shiftpublisher.model.roster.Roster;
 import iansteph.nhlp3.shiftpublisher.model.toi.PlayerTimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.TimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Shift;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Summary;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.summary.ShiftAggregation;
+import iansteph.nhlp3.shiftpublisher.proxy.NhlDataProxy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
@@ -24,6 +27,8 @@ import java.util.stream.Collectors;
 
 public class TimeOnIceReportParser {
 
+    private final NhlDataProxy nhlDataProxy;
+
     private static final String PLAYER_SHIFT_REPORT_DATA_KEY = "playerShiftReportData";
     private static final String PLAYER_TIME_ON_ICE_SUMMARY_DATA_KEY = "playerTimeOnIceSummaryData";
     private static final String SHIFT_EVENT_GOAL_KEY = "G";
@@ -31,6 +36,11 @@ public class TimeOnIceReportParser {
     private static final String TOTAL_SHIFT_AGGREGATION = "TOT";
 
     private static final Logger LOGGER = LogManager.getLogger(TimeOnIceReportParser.class);
+
+    public TimeOnIceReportParser(final NhlDataProxy nhlDataProxy) {
+
+        this.nhlDataProxy = nhlDataProxy;
+    }
 
     public TimeOnIceReport parse(final Document rawTimeOnIceReport) {
 
@@ -73,6 +83,14 @@ public class TimeOnIceReportParser {
                     }
                 });
 
+        final String teamName = parseTeamName(rawTimeOnIceReport);
+        final int teamId = NhlTeamIdMapping.TEAM_NAME_TO_TEAM_ID_MAP.get(teamName);
+        final Roster roster = nhlDataProxy.getRosterForTeamId(teamId);
+        final Map<String, Player> playerDataMap = roster.getRoster().stream()
+                .collect(Collectors.toMap(
+                        player -> (player.getJerseyNumber() + " " + player.getPerson().getFullName()).toUpperCase(),
+                        player -> player
+                ));
         final List<PlayerTimeOnIceReport> playerTimeOnIceReports = rawTimeOnIceData.entrySet().stream()
                 .map(entry -> {
 
@@ -80,14 +98,15 @@ public class TimeOnIceReportParser {
                     final Map<String, List<Element>> rawTimeOnIceReportData = entry.getValue();
                     final List<Element> rawShiftReportData = rawTimeOnIceReportData.get(PLAYER_SHIFT_REPORT_DATA_KEY);
                     final List<Element> rawTimeOnIceSummaryData = rawTimeOnIceReportData.get(PLAYER_TIME_ON_ICE_SUMMARY_DATA_KEY);
-                    final String teamName = parseTeamName(rawTimeOnIceReport);
                     final PlayerTimeOnIceReport playerTimeOnIceReport = parsePlayerIdentifiers(teamName, rawPlayerIdentifier);
                     final List<Shift> shift = parsePlayerShiftReport(rawShiftReportData);
                     playerTimeOnIceReport.setShifts(shift);
                     final Summary summary = parsePlayerTimeOnIceSummary(rawTimeOnIceSummaryData);
                     playerTimeOnIceReport.setSummary(summary);
-                    final int teamId = NhlTeamIdMapping.TEAM_NAME_TO_TEAM_ID_MAP.get(teamName);
                     playerTimeOnIceReport.setTeamId(teamId);
+                    final String playerKey = playerTimeOnIceReport.getNumber() + " " + playerTimeOnIceReport.getFirstName() + " " + playerTimeOnIceReport.getLastName();
+                    final Player player = playerDataMap.get(playerKey);
+                    playerTimeOnIceReport.setPlayer(player);
                     return playerTimeOnIceReport;
                 })
                 .collect(Collectors.toList());

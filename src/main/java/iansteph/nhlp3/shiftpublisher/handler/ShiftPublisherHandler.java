@@ -3,21 +3,26 @@ package iansteph.nhlp3.shiftpublisher.handler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import iansteph.nhlp3.shiftpublisher.client.NhlDataClient;
 import iansteph.nhlp3.shiftpublisher.client.NhlTimeOnIceClient;
 import iansteph.nhlp3.shiftpublisher.client.wrapper.JsoupWrapper;
 import iansteph.nhlp3.shiftpublisher.model.Team;
 import iansteph.nhlp3.shiftpublisher.model.event.ShiftEvent;
 import iansteph.nhlp3.shiftpublisher.model.request.ShiftPublisherRequest;
+import iansteph.nhlp3.shiftpublisher.model.roster.Player;
+import iansteph.nhlp3.shiftpublisher.model.roster.player.Position;
 import iansteph.nhlp3.shiftpublisher.model.toi.PlayerTimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.TimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Shift;
 import iansteph.nhlp3.shiftpublisher.parse.TimeOnIceReportParser;
 import iansteph.nhlp3.shiftpublisher.proxy.DynamoDbProxy;
+import iansteph.nhlp3.shiftpublisher.proxy.NhlDataProxy;
 import iansteph.nhlp3.shiftpublisher.proxy.NhlTimeOnIceProxy;
 import iansteph.nhlp3.shiftpublisher.proxy.SnsProxy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
+import org.springframework.web.client.RestTemplate;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.http.HttpStatusCode;
@@ -75,7 +80,11 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
                 .region(Region.US_EAST_1)
                 .build();
         this.snsProxy = new SnsProxy(objectMapper, snsClient);
-        this.timeOnIceReportParser = new TimeOnIceReportParser();
+
+        final RestTemplate restTemplate = new RestTemplate();
+        final NhlDataClient nhlDataClient = new NhlDataClient(restTemplate);
+        final NhlDataProxy nhlDataProxy = new NhlDataProxy(nhlDataClient);
+        this.timeOnIceReportParser = new TimeOnIceReportParser(nhlDataProxy);
     }
 
     public ShiftPublisherHandler(
@@ -182,6 +191,15 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
         shiftEvent.setPlayerJerseyNumber(playerTimeOnIceReport.getNumber());
         shiftEvent.setPlayerTeamId(playerTimeOnIceReport.getTeamId());
         shiftEvent.setShift(shift);
+
+        final Player player = playerTimeOnIceReport.getPlayer();
+        if (player != null) {
+
+            final int playerId = player.getPerson().getId();
+            shiftEvent.setPlayerId(playerId);
+            final Position playerPosition = player.getPosition();
+            shiftEvent.setPlayerPosition(playerPosition);
+        }
         return shiftEvent;
     }
 }

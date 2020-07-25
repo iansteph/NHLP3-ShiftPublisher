@@ -3,6 +3,9 @@ package iansteph.nhlp3.shiftpublisher.handler;
 import iansteph.nhlp3.shiftpublisher.model.Team;
 import iansteph.nhlp3.shiftpublisher.model.event.ShiftEvent;
 import iansteph.nhlp3.shiftpublisher.model.request.ShiftPublisherRequest;
+import iansteph.nhlp3.shiftpublisher.model.roster.Player;
+import iansteph.nhlp3.shiftpublisher.model.roster.player.Person;
+import iansteph.nhlp3.shiftpublisher.model.roster.player.Position;
 import iansteph.nhlp3.shiftpublisher.model.toi.PlayerTimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.TimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.player.Shift;
@@ -65,6 +68,12 @@ public class ShiftPublisherHandlerTest {
         erikKarlsson65.setNumber(65);
         erikKarlsson65.setTeamName("San Jose Sharks");
         erikKarlsson65.setTeamId(28);
+        final Player erikKarlssonPlayer = new Player();
+        final Person erikKarlssonPerson = new Person();
+        erikKarlssonPerson.setId(65);
+        erikKarlssonPlayer.setPosition(new Position());
+        erikKarlssonPlayer.setPerson(erikKarlssonPerson);
+        erikKarlsson65.setPlayer(erikKarlssonPlayer);
         final Shift erikKarlssonShift1 = new Shift();
         erikKarlssonShift1.setShiftNumber(1);
         final Shift erikKarlssonShift2 = new Shift();
@@ -78,6 +87,12 @@ public class ShiftPublisherHandlerTest {
         austonMatthews34.setNumber(34);
         austonMatthews34.setTeamName("Toronto Maple Leafs");
         austonMatthews34.setTeamId(10);
+        final Player austonMatthewsPlayer = new Player();
+        final Person austonMatthewsPerson = new Person();
+        austonMatthewsPerson.setId(34);
+        austonMatthewsPlayer.setPosition(new Position());
+        austonMatthewsPlayer.setPerson(austonMatthewsPerson);
+        austonMatthews34.setPlayer(austonMatthewsPlayer);
         final Shift austonMatthewsShift1 = new Shift();
         austonMatthewsShift1.setShiftNumber(1);
         final Shift austonMatthewsShift2 = new Shift();
@@ -98,6 +113,8 @@ public class ShiftPublisherHandlerTest {
         erikkarlsson.setPlayerTeamName("San Jose Sharks");
         erikkarlsson.setPlayerTeamId(28);
         erikkarlsson.setShift(erikKarlssonShift2);
+        erikkarlsson.setPlayerPosition(new Position());
+        erikkarlsson.setPlayerId(65);
         final ShiftEvent austonMatthews = new ShiftEvent();
         austonMatthews.setPlayerFirstName("AUSTON");
         austonMatthews.setPlayerLastName("MATTHEWS");
@@ -105,6 +122,8 @@ public class ShiftPublisherHandlerTest {
         austonMatthews.setPlayerTeamName("Toronto Maple Leafs");
         austonMatthews.setPlayerTeamId(10);
         austonMatthews.setShift(austonMatthewsShift2);
+        austonMatthews.setPlayerId(34);
+        austonMatthews.setPlayerPosition(new Position());
 
         shiftPublisherHandler.handleRequest(shiftPublisherRequest, null);
 
