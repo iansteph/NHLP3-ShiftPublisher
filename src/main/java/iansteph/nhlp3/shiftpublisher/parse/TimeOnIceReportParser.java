@@ -191,16 +191,8 @@ public class TimeOnIceReportParser {
 
         // Attendance
         final String[] attendanceComponents = rawVenueContextComponents[0].split(" ");
-        try {
-
-            final Integer attendance = NumberFormat.getNumberInstance(Locale.ENGLISH).parse(attendanceComponents[1].trim()).intValue();
-            timeOnIceReportWithVisitorAndHomeContext.setAttendance(attendance);
-        }
-        catch (final Exception e) {
-
-            LOGGER.error(e);
-            throw new RuntimeException(e);
-        }
+        final String attendance = attendanceComponents[1].trim();
+        timeOnIceReportWithVisitorAndHomeContext.setAttendance(attendance);
 
         // Venue name
         final String venueName = rawVenueContextComponents[1].trim();

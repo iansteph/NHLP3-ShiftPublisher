@@ -52,7 +52,7 @@ public class TimeOnIceReportParserTest {
         final TimeOnIceReport timeOnIceReport = timeOnIceReportParser.parse(document);
 
         assertThat(timeOnIceReport.getDate(), is("Tuesday, November 12, 2019"));
-        assertThat(timeOnIceReport.getAttendance(), is(20758));
+        assertThat(timeOnIceReport.getAttendance(), is("20,758"));
         assertThat(timeOnIceReport.getVenueName(), is("Centre Bell"));
         assertThat(timeOnIceReport.getStartTime(), is("7:08 EST"));
         assertThat(timeOnIceReport.getEndTime(), is("9:52 EST"));
@@ -81,7 +81,7 @@ public class TimeOnIceReportParserTest {
         final TimeOnIceReport timeOnIceReport = timeOnIceReportParser.parse(document);
 
         assertThat(timeOnIceReport.getDate(), is("Monday, May 6, 2019"));
-        assertThat(timeOnIceReport.getAttendance(), is(18098));
+        assertThat(timeOnIceReport.getAttendance(), is("18,098"));
         assertThat(timeOnIceReport.getVenueName(), is("Pepsi Center"));
         assertThat(timeOnIceReport.getStartTime(), is("8:09 MDT"));
         assertThat(timeOnIceReport.getEndTime(), is("11:04 MDT"));

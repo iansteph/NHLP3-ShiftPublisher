@@ -16,7 +16,7 @@ public class TimeOnIceReport {
     private Integer homeTeamGameNumber;
     private Integer homeTeamHomeGameNumber;
     private String date;
-    private Integer attendance;
+    private String attendance;
     private String venueName;
     private String startTime;
     private String endTime;
@@ -133,12 +133,12 @@ public class TimeOnIceReport {
         this.date = date;
     }
 
-    public Integer getAttendance() {
+    public String getAttendance() {
 
         return attendance;
     }
 
-    public void setAttendance(final Integer attendance) {
+    public void setAttendance(final String attendance) {
         this.attendance = attendance;
     }
 
