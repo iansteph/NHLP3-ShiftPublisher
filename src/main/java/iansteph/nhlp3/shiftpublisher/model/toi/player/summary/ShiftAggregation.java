@@ -6,7 +6,7 @@ public class ShiftAggregation {
 
     private String aggregationName;
     private int shiftsFor;
-    private int averageShiftLengthInSeconds;
+    private Integer averageShiftLengthInSeconds;
     private int timeOnIceInSeconds;
     private int evenStrengthTimeOnIceInSeconds;
     private int powerPlayTimeOnIceInSeconds;
@@ -32,12 +32,12 @@ public class ShiftAggregation {
         this.shiftsFor = shiftsFor;
     }
 
-    public int getAverageShiftLengthInSeconds() {
+    public Integer getAverageShiftLengthInSeconds() {
 
         return averageShiftLengthInSeconds;
     }
 
-    public void setAverageShiftLengthInSeconds(final int averageShiftLengthInSeconds) {
+    public void setAverageShiftLengthInSeconds(final Integer averageShiftLengthInSeconds) {
 
         this.averageShiftLengthInSeconds = averageShiftLengthInSeconds;
     }

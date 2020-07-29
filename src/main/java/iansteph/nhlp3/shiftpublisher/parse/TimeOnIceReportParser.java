@@ -206,8 +206,12 @@ public class TimeOnIceReportParser {
         timeOnIceReportWithVisitorAndHomeContext.setStartTime(startTime);
 
         // End time
-        final String endTime = gameTimeComponents[1].trim().substring(4);
-        timeOnIceReportWithVisitorAndHomeContext.setEndTime(endTime);
+        if (gameTimeComponents.length > 1) {
+
+            // When game is in progress the end time is not present
+            final String endTime = gameTimeComponents[1].trim().substring(4);
+            timeOnIceReportWithVisitorAndHomeContext.setEndTime(endTime);
+        }
 
         // NHL game number
         final String nhlGameNumber = rawSharedGameContext.get(4 + indexOffsetIfPlayoffGame).trim().substring(5);
@@ -365,8 +369,11 @@ public class TimeOnIceReportParser {
 
                         // Average Shift Length
                         final String rawAverageShiftLength = columns.get(2);
-                        final Duration averageShiftLength = durationFromTextNode(rawAverageShiftLength);
-                        shiftAggregation.setAverageShiftLengthInSeconds(convertDurationToSeconds(averageShiftLength));
+                        if (!rawAverageShiftLength.trim().isEmpty()) { // Sometimes there can be a blank cell data (observed for avg column for goalies)
+
+                            final Duration averageShiftLength = durationFromTextNode(rawAverageShiftLength);
+                            shiftAggregation.setAverageShiftLengthInSeconds(convertDurationToSeconds(averageShiftLength));
+                        }
 
                         // TOI
                         final String rawTimeOnIce = columns.get(3);
@@ -411,7 +418,7 @@ public class TimeOnIceReportParser {
         return duration;
     }
 
-    private int convertDurationToSeconds(final Duration duration) {
+    private Integer convertDurationToSeconds(final Duration duration) {
 
         return Math.toIntExact(duration.getSeconds());
     }
