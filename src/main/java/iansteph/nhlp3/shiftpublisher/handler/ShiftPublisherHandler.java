@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -103,12 +104,12 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
 
         final int gameId = shiftPublisherRequest.getGameId();
         final Map<String, Map<String, Integer>> shiftPublishingRecord = dynamoDbProxy.getShiftPublishingRecordForGameId(gameId);
-        final TimeOnIceReport visitorTimeOnIceReport = retrieveTimeOnIceReport(gameId, Team.VISITOR);
+        final Optional<TimeOnIceReport> visitorTimeOnIceReport = retrieveTimeOnIceReport(gameId, Team.VISITOR);
         final List<ShiftEvent> visitorShiftsToPublish = retrieveShiftsToPublishForTeam(Team.VISITOR, visitorTimeOnIceReport, shiftPublishingRecord);
-        final TimeOnIceReport homeTimeOnIceReport = retrieveTimeOnIceReport(gameId, Team.HOME);
+        final Optional<TimeOnIceReport> homeTimeOnIceReport = retrieveTimeOnIceReport(gameId, Team.HOME);
         final List<ShiftEvent> homeShiftsToPublish = retrieveShiftsToPublishForTeam(Team.HOME, homeTimeOnIceReport, shiftPublishingRecord);
         Arrays.asList(visitorShiftsToPublish, homeShiftsToPublish).forEach(snsProxy::publishShiftEvents);
-        dynamoDbProxy.putShiftPublishingRecord(gameId,  visitorTimeOnIceReport, homeTimeOnIceReport);
+        dynamoDbProxy.putShiftPublishingRecord(gameId, visitorTimeOnIceReport, homeTimeOnIceReport);
         return HttpStatusCode.OK;
     }
 
@@ -163,9 +164,16 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
 
     private List<ShiftEvent> retrieveShiftsToPublishForTeam(
             final Team team,
-            final TimeOnIceReport teamTimeOnIceReport,
+            final Optional<TimeOnIceReport> optionalTimeOnIceReport,
             final Map<String, Map<String, Integer>> shiftPublishingRecord
     ) {
+
+        if (!optionalTimeOnIceReport.isPresent()) {
+
+            // If there was no shift data available there are no shifts to publish
+            return Collections.emptyList();
+        }
+        final TimeOnIceReport teamTimeOnIceReport = optionalTimeOnIceReport.get();
         final String teamKey = team.getLabel().equals("V") ? "visitor" : "home";
         final Map<String, Integer> teamShiftPublishingRecord = shiftPublishingRecord.get(teamKey);
         final Map<String, List<ShiftEvent>> shiftsToPublish = retrieveShiftsToPublishFromTimeOnIceReport(teamTimeOnIceReport, teamShiftPublishingRecord);
@@ -175,10 +183,10 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
         return shiftEventsToPublish;
     }
 
-    private TimeOnIceReport retrieveTimeOnIceReport(final int gameId, final Team team) {
+    private Optional<TimeOnIceReport> retrieveTimeOnIceReport(final int gameId, final Team team) {
 
         final Document rawTeamTimeOnIceReport = nhlTimeOnIceProxy.getToiReportForGame(gameId, team);
-        final TimeOnIceReport teamTimeOnIceReport = timeOnIceReportParser.parse(rawTeamTimeOnIceReport);
+        final Optional<TimeOnIceReport> teamTimeOnIceReport = timeOnIceReportParser.parse(rawTeamTimeOnIceReport);
         return teamTimeOnIceReport;
     }
 

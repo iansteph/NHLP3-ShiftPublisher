@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
@@ -106,7 +107,8 @@ public class DynamoDbProxyTest {
         final int gameId = 2019030273;
         final ArgumentCaptor<PutItemRequest> putItemRequestArgumentCaptor = ArgumentCaptor.forClass(PutItemRequest.class);
 
-        dynamoDbProxy.putShiftPublishingRecord(gameId, visitorTimeOnIceReport, homeTimeOnIceReport);
+        dynamoDbProxy.putShiftPublishingRecord(gameId, Optional.of(visitorTimeOnIceReport), Optional.of(homeTimeOnIceReport));
+
         verify(mockDynamoDbClient, times(1)).putItem(putItemRequestArgumentCaptor.capture());
         final PutItemRequest putItemRequest = putItemRequestArgumentCaptor.getValue();
         assertThat(putItemRequest.tableName(), is(TABLE_NAME));
@@ -134,6 +136,6 @@ public class DynamoDbProxyTest {
         when(mockDynamoDbClient.putItem(any(PutItemRequest.class))).thenThrow(ResourceNotFoundException.builder().build());
         final int gameId = 2019030273;
 
-        dynamoDbProxy.putShiftPublishingRecord(gameId, new TimeOnIceReport(), new TimeOnIceReport());
+        dynamoDbProxy.putShiftPublishingRecord(gameId, Optional.of(new TimeOnIceReport()), Optional.of(new TimeOnIceReport()));
     }
 }

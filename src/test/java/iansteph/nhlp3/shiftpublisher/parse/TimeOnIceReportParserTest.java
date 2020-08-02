@@ -20,9 +20,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertFalse;
@@ -35,12 +37,14 @@ import static org.mockito.Mockito.when;
 public class TimeOnIceReportParserTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String IN_PRORGRESS_GAME_ROSTER_TEST_RESOURCE = "src/test/resources/in-progress-game-roster.json";
-    private static final String IN_PROGRESS_GAME_TOI_REPORT_TEST_RESOURCE = "src/test/resources/in-progress-game.HTM";
-    private static final String REGULAR_SEASON_VISITOR_GAME_ROSTER_TEST_RESOURCE = "src/test/resources/TV020273-roster.json";
-    private static final String REGULAR_SEASON_VISITOR_GAME_TOI_REPORT_TEST_RESOURCE = "src/test/resources/TV020273.HTM";
-    private static final String PLAYOFF_HOME_GAME_ROSTER_TEST_RESOURCE = "src/test/resources/TH030246-roster.json";
-    private static final String PLAYOFF_HOME_GAME_TOI_REPORT_TEST_RESOURCE = "src/test/resources/TH030246.HTM";
+    private static final String IN_PROGRESS_GAME_ROSTER_TEST_RESOURCE = "src/test/resources/rosters/in-progress-game.json";
+    private static final String IN_PROGRESS_GAME_TOI_REPORT_TEST_RESOURCE = "src/test/resources/timeonicereports/in-progress-game.HTM";
+    private static final String NO_SHIFT_DATA_ROSTER_TEST_RESOURCE = "src/test/resources/rosters/no-shift-data.json";
+    private static final String NO_SHIFT_DATA_TOI_REPORT_TEST_RESOURCE = "src/test/resources/timeonicereports/no-shift-data.HTM";
+    private static final String PLAYOFF_HOME_GAME_ROSTER_TEST_RESOURCE = "src/test/resources/rosters/playoff-game.json";
+    private static final String PLAYOFF_HOME_GAME_TOI_REPORT_TEST_RESOURCE = "src/test/resources/timeonicereports/playoff-game.HTM";
+    private static final String REGULAR_SEASON_VISITOR_GAME_ROSTER_TEST_RESOURCE = "src/test/resources/rosters/regular-season-game.json";
+    private static final String REGULAR_SEASON_VISITOR_GAME_TOI_REPORT_TEST_RESOURCE = "src/test/resources/timeonicereports/regular-season-game.HTM";
 
     private final NhlDataProxy mockNhlDataProxy = mock(NhlDataProxy.class);
     private final TimeOnIceReportParser timeOnIceReportParser = new TimeOnIceReportParser(mockNhlDataProxy);
@@ -52,8 +56,10 @@ public class TimeOnIceReportParserTest {
         when(mockNhlDataProxy.getRosterForTeamId(anyInt())).thenReturn(roster);
         final Document document = loadTestResourceAsDocumentFromFile(REGULAR_SEASON_VISITOR_GAME_TOI_REPORT_TEST_RESOURCE);
 
-        final TimeOnIceReport timeOnIceReport = timeOnIceReportParser.parse(document);
+        final Optional<TimeOnIceReport> optionalTimeOnIceReport = timeOnIceReportParser.parse(document);
 
+        assertThat(optionalTimeOnIceReport, is(not(Optional.empty())));
+        final TimeOnIceReport timeOnIceReport = optionalTimeOnIceReport.get();
         assertThat(timeOnIceReport.getDate(), is("Tuesday, November 12, 2019"));
         assertThat(timeOnIceReport.getAttendance(), is("20,758"));
         assertThat(timeOnIceReport.getVenueName(), is("Centre Bell"));
@@ -81,8 +87,10 @@ public class TimeOnIceReportParserTest {
         when(mockNhlDataProxy.getRosterForTeamId(anyInt())).thenReturn(roster);
         final Document document = loadTestResourceAsDocumentFromFile(PLAYOFF_HOME_GAME_TOI_REPORT_TEST_RESOURCE);
 
-        final TimeOnIceReport timeOnIceReport = timeOnIceReportParser.parse(document);
+        final Optional<TimeOnIceReport> optionalTimeOnIceReport = timeOnIceReportParser.parse(document);
 
+        assertThat(optionalTimeOnIceReport, is(not(Optional.empty())));
+        final TimeOnIceReport timeOnIceReport = optionalTimeOnIceReport.get();
         assertThat(timeOnIceReport.getDate(), is("Monday, May 6, 2019"));
         assertThat(timeOnIceReport.getAttendance(), is("18,098"));
         assertThat(timeOnIceReport.getVenueName(), is("Pepsi Center"));
@@ -106,12 +114,14 @@ public class TimeOnIceReportParserTest {
     @Test
     public void test_parse_successfully_parses_time_on_ice_report_for_a_given_team_and_with_empty_average_shift_length_cell_in_aggregation_section() throws IOException {
 
-        final Roster roster = parseTestResourceIntoRoster(IN_PRORGRESS_GAME_ROSTER_TEST_RESOURCE);
+        final Roster roster = parseTestResourceIntoRoster(IN_PROGRESS_GAME_ROSTER_TEST_RESOURCE);
         when(mockNhlDataProxy.getRosterForTeamId(anyInt())).thenReturn(roster);
         final Document document = loadTestResourceAsDocumentFromFile(IN_PROGRESS_GAME_TOI_REPORT_TEST_RESOURCE);
 
-        final TimeOnIceReport timeOnIceReport = timeOnIceReportParser.parse(document);
+        final Optional<TimeOnIceReport> optionalTimeOnIceReport = timeOnIceReportParser.parse(document);
 
+        assertThat(optionalTimeOnIceReport, is(not(Optional.empty())));
+        final TimeOnIceReport timeOnIceReport = optionalTimeOnIceReport.get();
         assertThat(timeOnIceReport.getDate(), is("Tuesday, July 28, 2020"));
         assertThat(timeOnIceReport.getAttendance(), is("n/a"));
         assertThat(timeOnIceReport.getVenueName(), is("Scotiabank Arena"));
@@ -130,6 +140,18 @@ public class TimeOnIceReportParserTest {
         assertThat(timeOnIceReport.getHomeTeamGameNumber(), is(1));
         assertThat(timeOnIceReport.getHomeTeamHomeGameNumber(), is(1));
         verifyPlayerTimeOnIceReports(timeOnIceReport.getPlayerTimeOnIceReports());
+    }
+
+    @Test
+    public void test_parse_successfully_parses_time_on_ice_report_for_a_given_team_with_no_shift_data() throws IOException {
+
+        final Roster roster = parseTestResourceIntoRoster(NO_SHIFT_DATA_ROSTER_TEST_RESOURCE);
+        when(mockNhlDataProxy.getRosterForTeamId(anyInt())).thenReturn(roster);
+        final Document document = loadTestResourceAsDocumentFromFile(NO_SHIFT_DATA_TOI_REPORT_TEST_RESOURCE);
+
+        final Optional<TimeOnIceReport> optionalTimeOnIceReport = timeOnIceReportParser.parse(document);
+
+        assertThat(optionalTimeOnIceReport, is(Optional.empty()));
     }
 
     private Document loadTestResourceAsDocumentFromFile(final String fileName) throws IOException {

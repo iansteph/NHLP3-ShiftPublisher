@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -99,7 +100,7 @@ public class ShiftPublisherHandlerTest {
         austonMatthewsShift2.setShiftNumber(2);
         austonMatthews34.setShifts(Arrays.asList(austonMatthewsShift1, austonMatthewsShift2));
         homeTimeOnIceReport.setPlayerTimeOnIceReports(Collections.singletonList(austonMatthews34));
-        when(mockTimeOnIceReportParser.parse(any(Document.class))).thenReturn(visitorTimeOnIceReport).thenReturn(homeTimeOnIceReport);
+        when(mockTimeOnIceReportParser.parse(any(Document.class))).thenReturn(Optional.of(visitorTimeOnIceReport)).thenReturn(Optional.of(homeTimeOnIceReport));
 
         // Mock ShiftPublisherRequest
         final ShiftPublisherRequest shiftPublisherRequest = new ShiftPublisherRequest();
@@ -128,7 +129,7 @@ public class ShiftPublisherHandlerTest {
         shiftPublisherHandler.handleRequest(shiftPublisherRequest, null);
 
         verify(mockDynamoDbProxy, times(1)).getShiftPublishingRecordForGameId(anyInt());
-        verify(mockDynamoDbProxy, times(1)).putShiftPublishingRecord(anyInt(), any(TimeOnIceReport.class), any(TimeOnIceReport.class));
+        verify(mockDynamoDbProxy, times(1)).putShiftPublishingRecord(anyInt(), any(), any());
         verify(mockNhlTimeOnIceProxy, times(1)).getToiReportForGame(eq(gameId), eq(Team.VISITOR));
         verify(mockNhlTimeOnIceProxy, times(1)).getToiReportForGame(eq(gameId), eq(Team.HOME));
         verify(mockTimeOnIceReportParser, times(2)).parse(any(Document.class));
@@ -175,7 +176,7 @@ public class ShiftPublisherHandlerTest {
         austonMatthewsShift.setShiftNumber(1);
         austonMatthews34.setShifts(Collections.singletonList(austonMatthewsShift));
         homeTimeOnIceReport.setPlayerTimeOnIceReports(Collections.singletonList(austonMatthews34));
-        when(mockTimeOnIceReportParser.parse(any(Document.class))).thenReturn(visitorTimeOnIceReport).thenReturn(homeTimeOnIceReport);
+        when(mockTimeOnIceReportParser.parse(any(Document.class))).thenReturn(Optional.of(visitorTimeOnIceReport)).thenReturn(Optional.of(homeTimeOnIceReport));
 
         // Mock ShiftPublisherRequest
         final ShiftPublisherRequest shiftPublisherRequest = new ShiftPublisherRequest();
@@ -184,7 +185,43 @@ public class ShiftPublisherHandlerTest {
         shiftPublisherHandler.handleRequest(shiftPublisherRequest, null);
 
         verify(mockDynamoDbProxy, times(1)).getShiftPublishingRecordForGameId(anyInt());
-        verify(mockDynamoDbProxy, times(1)).putShiftPublishingRecord(anyInt(), any(TimeOnIceReport.class), any(TimeOnIceReport.class));
+        verify(mockDynamoDbProxy, times(1)).putShiftPublishingRecord(anyInt(), any(), any());
+        verify(mockNhlTimeOnIceProxy, times(1)).getToiReportForGame(eq(gameId), eq(Team.VISITOR));
+        verify(mockNhlTimeOnIceProxy, times(1)).getToiReportForGame(eq(gameId), eq(Team.HOME));
+        verify(mockTimeOnIceReportParser, times(2)).parse(any(Document.class));
+        final ArgumentCaptor<List<ShiftEvent>> shiftEventArgumentCaptor = ArgumentCaptor.forClass(List.class);
+        verify(mockSnsProxy, times(2)).publishShiftEvents(shiftEventArgumentCaptor.capture());
+        final List<ShiftEvent> actualShiftEvents = shiftEventArgumentCaptor.getValue();
+        assertThat(actualShiftEvents.size(), is(0));
+    }
+
+    @Test
+    public void test_handleRequest_publishes_zero_shift_events_when_the_time_on_ice_report_has_no_shift_data() {
+
+        final int gameId = 2019030273;
+
+        // Mock DynamoDB
+        final Map<String, Map<String, Integer>> shiftPublishingRecord = new HashMap<>();
+        final Map<String, Integer> visitorShiftPublishingRecord = new HashMap<>();
+        shiftPublishingRecord.put("visitor", visitorShiftPublishingRecord);
+        final Map<String, Integer> homeShiftPublishingRecord = new HashMap<>();
+        shiftPublishingRecord.put("home", homeShiftPublishingRecord);
+        when(mockDynamoDbProxy.getShiftPublishingRecordForGameId(anyInt())).thenReturn(shiftPublishingRecord);
+
+        // Mock HTML Retrieval
+        when(mockNhlTimeOnIceProxy.getToiReportForGame(anyInt(), any(Team.class))).thenReturn(new Document("SomeBaseUri"));
+
+        // Mock HTML Parsing
+        when(mockTimeOnIceReportParser.parse(any(Document.class))).thenReturn(Optional.empty()).thenReturn(Optional.empty());
+
+        // Mock ShiftPublisherRequest
+        final ShiftPublisherRequest shiftPublisherRequest = new ShiftPublisherRequest();
+        shiftPublisherRequest.setGameId(gameId);
+
+        shiftPublisherHandler.handleRequest(shiftPublisherRequest, null);
+
+        verify(mockDynamoDbProxy, times(1)).getShiftPublishingRecordForGameId(anyInt());
+        verify(mockDynamoDbProxy, times(1)).putShiftPublishingRecord(anyInt(), any(), any());
         verify(mockNhlTimeOnIceProxy, times(1)).getToiReportForGame(eq(gameId), eq(Team.VISITOR));
         verify(mockNhlTimeOnIceProxy, times(1)).getToiReportForGame(eq(gameId), eq(Team.HOME));
         verify(mockTimeOnIceReportParser, times(2)).parse(any(Document.class));
@@ -235,7 +272,7 @@ public class ShiftPublisherHandlerTest {
         austonMatthewsShift2.setShiftNumber(2);
         austonMatthews34.setShifts(Arrays.asList(austonMatthewsShift1, austonMatthewsShift2));
         homeTimeOnIceReport.setPlayerTimeOnIceReports(Collections.singletonList(austonMatthews34));
-        when(mockTimeOnIceReportParser.parse(any(Document.class))).thenReturn(visitorTimeOnIceReport).thenReturn(homeTimeOnIceReport);
+        when(mockTimeOnIceReportParser.parse(any(Document.class))).thenReturn(Optional.of(visitorTimeOnIceReport)).thenReturn(Optional.of(homeTimeOnIceReport));
 
         // Mock ShiftPublisherRequest
         final ShiftPublisherRequest shiftPublisherRequest = new ShiftPublisherRequest();
@@ -282,7 +319,7 @@ public class ShiftPublisherHandlerTest {
         shiftPublisherHandler.handleRequest(shiftPublisherRequest, null);
 
         verify(mockDynamoDbProxy, times(1)).getShiftPublishingRecordForGameId(anyInt());
-        verify(mockDynamoDbProxy, times(1)).putShiftPublishingRecord(anyInt(), any(TimeOnIceReport.class), any(TimeOnIceReport.class));
+        verify(mockDynamoDbProxy, times(1)).putShiftPublishingRecord(anyInt(), any(), any());
         verify(mockNhlTimeOnIceProxy, times(1)).getToiReportForGame(eq(gameId), eq(Team.VISITOR));
         verify(mockNhlTimeOnIceProxy, times(1)).getToiReportForGame(eq(gameId), eq(Team.HOME));
         verify(mockTimeOnIceReportParser, times(2)).parse(any(Document.class));

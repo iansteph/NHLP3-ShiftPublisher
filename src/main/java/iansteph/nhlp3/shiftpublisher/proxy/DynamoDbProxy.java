@@ -1,5 +1,6 @@
 package iansteph.nhlp3.shiftpublisher.proxy;
 
+import iansteph.nhlp3.shiftpublisher.model.toi.PlayerTimeOnIceReport;
 import iansteph.nhlp3.shiftpublisher.model.toi.TimeOnIceReport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,8 +10,11 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -57,13 +61,13 @@ public class DynamoDbProxy {
 
     public void putShiftPublishingRecord(
             final int gameId,
-            final TimeOnIceReport visitorTimeOnIceReport,
-            final TimeOnIceReport homeTimeOnIceReport
+            final Optional<TimeOnIceReport> optionalVisitorTimeOnIceReport,
+            final Optional<TimeOnIceReport> optionalHomeTimeOnIceReport
     ) {
         try {
 
             final String key = format("SHIFTPUBLISHING#%d", gameId);
-            final Map<String, AttributeValue> item = transformTimeOnIceReportsToDynamoDbAttribute(visitorTimeOnIceReport, homeTimeOnIceReport);
+            final Map<String, AttributeValue> item = transformTimeOnIceReportsToDynamoDbAttribute(optionalVisitorTimeOnIceReport, optionalHomeTimeOnIceReport);
             item.put(TABLE_PARTITION_KEY_ATTRIBUTE_NAME, AttributeValue.builder().s(key).build());
             item.put(TABLE_SORT_KEY_ATTRIBUTE_NAME, AttributeValue.builder().s(key).build());
             final PutItemRequest putItemRequest = PutItemRequest.builder()
@@ -96,8 +100,8 @@ public class DynamoDbProxy {
     }
 
     private Map<String, AttributeValue> transformTimeOnIceReportsToDynamoDbAttribute(
-            final TimeOnIceReport visitorTimeOnIceReport,
-            final TimeOnIceReport homeTimeOnIceReport
+            final Optional<TimeOnIceReport> visitorTimeOnIceReport,
+            final Optional<TimeOnIceReport> homeTimeOnIceReport
     ) {
         final Map<String, AttributeValue> visitorMap = buildPlayerShiftPublishingRecordMap(visitorTimeOnIceReport);
         final Map<String, AttributeValue> homeMap = buildPlayerShiftPublishingRecordMap(homeTimeOnIceReport);
@@ -109,9 +113,11 @@ public class DynamoDbProxy {
         return shiftPublishingRecordAttribute;
     }
 
-    private Map<String, AttributeValue> buildPlayerShiftPublishingRecordMap(final TimeOnIceReport timeOnIceReport) {
+    private Map<String, AttributeValue> buildPlayerShiftPublishingRecordMap(final Optional<TimeOnIceReport> optionalTimeOnIceReport) {
 
-        final Map<String, AttributeValue> map = timeOnIceReport.getPlayerTimeOnIceReports().stream()
+        final Optional<List<PlayerTimeOnIceReport>> optionalPlayerTimeOnIceReports = optionalTimeOnIceReport.map(TimeOnIceReport::getPlayerTimeOnIceReports);
+        final List<PlayerTimeOnIceReport> playerTimeOnIceReports = optionalPlayerTimeOnIceReports.orElse(Collections.emptyList());
+        final Map<String, AttributeValue> map = playerTimeOnIceReports.stream()
                 .collect(Collectors.toMap(
                         playerTimeOnIceReport -> format("%s %s %d", playerTimeOnIceReport.getFirstName(), playerTimeOnIceReport.getLastName(), playerTimeOnIceReport.getNumber()),
                         playerTimeOnIceReport -> AttributeValue.builder().n(String.valueOf(playerTimeOnIceReport.getShifts().size())).build()

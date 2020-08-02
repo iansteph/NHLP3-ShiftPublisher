@@ -15,13 +15,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 
-import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -42,10 +41,15 @@ public class TimeOnIceReportParser {
         this.nhlDataProxy = nhlDataProxy;
     }
 
-    public TimeOnIceReport parse(final Document rawTimeOnIceReport) {
+    public Optional<TimeOnIceReport> parse(final Document rawTimeOnIceReport) {
 
-        final Element mainDataTable = retrieveMainDataTable(rawTimeOnIceReport);
+        final Optional<Element> optionalMainDataTable = retrieveMainDataTable(rawTimeOnIceReport);
+        if (!optionalMainDataTable.isPresent()) {
 
+            // If there is no shift data in the main data table yet, skip parsing
+            return Optional.empty();
+        }
+        final Element mainDataTable = optionalMainDataTable.get();
         final Map<String, Map<String, List<Element>>> rawTimeOnIceData = new HashMap<>();
         final Stack<String> currentGroupingQueue = new Stack<>();
         currentGroupingQueue.push(null);
@@ -113,10 +117,10 @@ public class TimeOnIceReportParser {
         final TimeOnIceReport timeOnIceReport = parseGameContext(rawTimeOnIceReport);
         timeOnIceReport.setPlayerTimeOnIceReports(playerTimeOnIceReports);
 
-        return timeOnIceReport;
+        return Optional.of(timeOnIceReport);
     }
 
-    private Element retrieveMainDataTable(final Document document) {
+    private Optional<Element> retrieveMainDataTable(final Document document) {
 
         final Element mainDataTable = document
                 .body()    // Get the HTML body
@@ -125,9 +129,19 @@ public class TimeOnIceReportParser {
                 .child(0)  // Narrow down into table body
                 .child(3)  // Skip to the beginning of shift data rows
                 .child(0)  // Remove surrounding <td> element containing all shift data
-                .child(0)  // Narrow down into surrounding <table> element containing all shift data
-                .child(0); // Narrow down into table body element containing all shift data
-        return mainDataTable;
+                .child(0);  // Narrow down into surrounding <table> element containing all shift data
+
+        // When the game starts in the first minutes there is no shift data in the table
+        if (mainDataTable.childrenSize() > 0) {
+
+            final Element mainDataTableElement =  mainDataTable.child(0); // Narrow down into table body element containing all shift data
+            return Optional.of(mainDataTableElement);
+        }
+        else {
+
+            // TODO - Write test case for this
+            return Optional.empty();
+        }
     }
 
     private boolean isElementPlayerShiftReportData(final Element element) {
