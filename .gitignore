@@ -12,3 +12,5 @@ buildNumber.properties
 
 .idea
 .DS_Store
+.aws-sam/
+samconfig.toml
