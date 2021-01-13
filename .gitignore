@@ -11,3 +11,6 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 
 .idea
+.DS_Store
+.aws-sam/
+samconfig.toml

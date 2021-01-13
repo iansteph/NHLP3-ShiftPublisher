@@ -1,0 +1,181 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for ShiftPublisher
+
+Resources:
+  ShiftPublisherFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ShiftPublisherFunction
+      Handler: iansteph.nhlp3.shiftpublisher.handler.ShiftPublisherHandler::handleRequest
+      Runtime: java8
+      Description: ShiftPublisher function for NHLP3 to set play-by-play-processing for games
+      MemorySize: 1024
+      Timeout: 60
+      Role:
+        Fn::GetAtt:
+          - ShiftPublisherExecutionRole
+          - Arn
+
+  ShiftPublisherExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: IAM Role assumed when invoking the ShiftPublisher lambda function
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ShiftPublishingPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource:
+                  Ref: ShiftPublisherSnsTopic
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                Resource: 'arn:aws:dynamodb:us-east-1:627812672245:table/NHLP3-Aggregate'
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                Resource:
+                  Fn::GetAtt:
+                    - TOIReportVersionHistoryBucket
+                    - Arn
+
+  ShiftPublisherFunctionLambaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+          - ShiftPublisherFunction
+          - Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: 'arn:aws:events:us-east-1:627812672245:rule/GameId-*'
+
+  ShiftPublisherSnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName:
+        Fn::Sub: NHLP3-Shift-Events
+      Subscription:
+        - Endpoint:
+            Fn::GetAtt:
+              - ShiftPublishingAuditQueue
+              - Arn
+          Protocol: sqs
+
+  NHLP3EventsSnsTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - Ref: ShiftPublisherSnsTopic
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowAllAwsAccountSubscriptionsIfUsingLambdaOrSqsProtocol
+            Effect: Allow
+            Principal:
+              AWS: '*'
+            Action:
+              - sns:Subscribe
+            Resource:
+              Ref: ShiftPublisherSnsTopic
+            Condition:
+              StringEquals:
+                sns:Protocol:
+                  - "lambda"
+                  - "sqs"
+          - Sid: OnlyShiftPublisherExecutionRoleCanPublishMessagesToSnsTopic
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - ShiftPublisherExecutionRole
+                  - Arn
+            Action:
+              - sns:Publish
+            Resource:
+              Ref: ShiftPublisherSnsTopic
+
+  TOIReportVersionHistoryBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub: nhlp3-shift-publisher-toi-report-version-history
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  TOIReportVersionHistoryBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: TOIReportVersionHistoryBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Id: AllowShiftPublisherToVersionTOIReports
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - ShiftPublisherExecutionRole
+                  - Arn
+            Action: 's3:*'
+            Resource:
+              - Fn::GetAtt:
+                  - TOIReportVersionHistoryBucket
+                  - Arn
+              - Fn::Join:
+                  - ''
+                  - - Fn::GetAtt:
+                        - TOIReportVersionHistoryBucket
+                        - Arn
+                    - '/*'
+
+  ShiftPublishingAuditQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: NHLP3-ShiftPublishing-Audit
+      MessageRetentionPeriod: 1209600 # The maximum (14 days)
+
+  ShiftPublishingAuditQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - Ref: ShiftPublishingAuditQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: sns.amazonaws.com
+            Action:
+              - sqs:SendMessage
+            Resource: '*'
+            Condition:
+              ArnEquals:
+                aws:SourceArn:
+                  Ref: ShiftPublisherSnsTopic
