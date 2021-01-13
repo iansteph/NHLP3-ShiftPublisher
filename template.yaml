@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for ShiftPublisher
+
+Resources:
+  ShiftPublisherFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ShiftPublisherFunction
+      Handler: iansteph.nhlp3.shiftpublisher.ShiftPublisherHandler::handleRequest
+      Runtime: java8
+      Description: ShiftPublisher function for NHLP3 to set play-by-play-processing for games
+      MemorySize: 1024
+      Timeout: 60
+      Role:
+        Fn::GetAtt:
+          - ShiftPublisherExecutionRole
+          - Arn
