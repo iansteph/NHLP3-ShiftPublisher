@@ -30,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,7 +60,7 @@ public class ShiftPublisherHandlerTest {
         when(mockDynamoDbProxy.getShiftPublishingRecordForGameId(anyInt())).thenReturn(shiftPublishingRecord);
 
         // Mock HTML Retrieval
-        when(mockNhlTimeOnIceProxy.getToiReportForGame(anyInt(), any(Team.class))).thenReturn(new Document("SomeBaseUri"));
+        when(mockNhlTimeOnIceProxy.getToiReportForGame(anyInt(), any(Team.class))).thenReturn(Optional.of(new Document("SomeBaseUri")));
 
         // Mock HTML Parsing
         final TimeOnIceReport visitorTimeOnIceReport = new TimeOnIceReport();
@@ -153,7 +154,7 @@ public class ShiftPublisherHandlerTest {
         when(mockDynamoDbProxy.getShiftPublishingRecordForGameId(anyInt())).thenReturn(shiftPublishingRecord);
 
         // Mock HTML Retrieval
-        when(mockNhlTimeOnIceProxy.getToiReportForGame(anyInt(), any(Team.class))).thenReturn(new Document("SomeBaseUri"));
+        when(mockNhlTimeOnIceProxy.getToiReportForGame(anyInt(), any(Team.class))).thenReturn(Optional.of(new Document("SomeBaseUri")));
 
         // Mock HTML Parsing
         final TimeOnIceReport visitorTimeOnIceReport = new TimeOnIceReport();
@@ -209,7 +210,7 @@ public class ShiftPublisherHandlerTest {
         when(mockDynamoDbProxy.getShiftPublishingRecordForGameId(anyInt())).thenReturn(shiftPublishingRecord);
 
         // Mock HTML Retrieval
-        when(mockNhlTimeOnIceProxy.getToiReportForGame(anyInt(), any(Team.class))).thenReturn(new Document("SomeBaseUri"));
+        when(mockNhlTimeOnIceProxy.getToiReportForGame(anyInt(), any(Team.class))).thenReturn(Optional.of(new Document("SomeBaseUri")));
 
         // Mock HTML Parsing
         when(mockTimeOnIceReportParser.parse(any(Document.class))).thenReturn(Optional.empty()).thenReturn(Optional.empty());
@@ -232,6 +233,42 @@ public class ShiftPublisherHandlerTest {
     }
 
     @Test
+    public void test_handleRequest_publishes_zero_shift_events_when_the_time_on_ice_report_fails_retrieval() {
+
+        final int gameId = 2019030273;
+
+        // Mock DynamoDB
+        final Map<String, Map<String, Integer>> shiftPublishingRecord = new HashMap<>();
+        final Map<String, Integer> visitorShiftPublishingRecord = new HashMap<>();
+        shiftPublishingRecord.put("visitor", visitorShiftPublishingRecord);
+        final Map<String, Integer> homeShiftPublishingRecord = new HashMap<>();
+        shiftPublishingRecord.put("home", homeShiftPublishingRecord);
+        when(mockDynamoDbProxy.getShiftPublishingRecordForGameId(anyInt())).thenReturn(shiftPublishingRecord);
+
+        // Mock HTML Retrieval
+        when(mockNhlTimeOnIceProxy.getToiReportForGame(anyInt(), any(Team.class))).thenReturn(Optional.empty());
+
+        // Mock HTML Parsing
+        when(mockTimeOnIceReportParser.parse(any(Document.class))).thenReturn(Optional.empty()).thenReturn(Optional.empty());
+
+        // Mock ShiftPublisherRequest
+        final ShiftPublisherRequest shiftPublisherRequest = new ShiftPublisherRequest();
+        shiftPublisherRequest.setGameId(gameId);
+
+        shiftPublisherHandler.handleRequest(shiftPublisherRequest, null);
+
+        verify(mockDynamoDbProxy, times(1)).getShiftPublishingRecordForGameId(anyInt());
+        verify(mockDynamoDbProxy, times(1)).putShiftPublishingRecord(anyInt(), any(), any());
+        verify(mockNhlTimeOnIceProxy, times(1)).getToiReportForGame(eq(gameId), eq(Team.VISITOR));
+        verify(mockNhlTimeOnIceProxy, times(1)).getToiReportForGame(eq(gameId), eq(Team.HOME));
+        verify(mockTimeOnIceReportParser, never()).parse(any(Document.class));
+        final ArgumentCaptor<List<ShiftEvent>> shiftEventArgumentCaptor = ArgumentCaptor.forClass(List.class);
+        verify(mockSnsProxy, times(2)).publishShiftEvents(shiftEventArgumentCaptor.capture());
+        final List<ShiftEvent> actualShiftEvents = shiftEventArgumentCaptor.getValue();
+        assertThat(actualShiftEvents.size(), is(0));
+    }
+
+    @Test
     public void test_handleRequest_publishes_shift_events_when_there_is_a_new_player_with_shift_data_in_the_time_on_ice_report() {
 
         final int gameId = 2019030273;
@@ -243,7 +280,7 @@ public class ShiftPublisherHandlerTest {
         when(mockDynamoDbProxy.getShiftPublishingRecordForGameId(anyInt())).thenReturn(shiftPublishingRecord);
 
         // Mock HTML Retrieval
-        when(mockNhlTimeOnIceProxy.getToiReportForGame(anyInt(), any(Team.class))).thenReturn(new Document("SomeBaseUri"));
+        when(mockNhlTimeOnIceProxy.getToiReportForGame(anyInt(), any(Team.class))).thenReturn(Optional.of(new Document("SomeBaseUri")));
 
         // Mock HTML Parsing
         final TimeOnIceReport visitorTimeOnIceReport = new TimeOnIceReport();

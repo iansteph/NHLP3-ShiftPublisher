@@ -9,6 +9,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
+import java.util.Optional;
+
 import static java.lang.String.format;
 
 public class NhlTimeOnIceClient {
@@ -25,13 +27,16 @@ public class NhlTimeOnIceClient {
         this.s3Client = s3Client;
     }
 
-    public Document getTeamToiReportForGame(final String season, final String teamAbbreviation, final String game) {
+    public Optional<Document> getTeamToiReportForGame(final String season, final String teamAbbreviation, final String game) {
 
         final String resolvedUrl = format("http://www.nhl.com/scores/htmlreports/%s/T%s%s.HTM", season, teamAbbreviation, game);
         archiveTimeOnIceReportVersionHistory(season, teamAbbreviation, game, resolvedUrl);
         LOGGER.info(format("Retrieving TOI report for game %s in season %s for team %s via URL %s", game, season, teamAbbreviation, resolvedUrl));
-        final Document toiReport = jsoupWrapper.parseHtmlFromUrl(resolvedUrl);
-        LOGGER.info(format("Successfully retrieved TOI report for game %s in season %s for team %s", game, season, teamAbbreviation));
+        final Optional<Document> toiReport = jsoupWrapper.parseHtmlFromUrl(resolvedUrl);
+        if (toiReport.isPresent()) {
+
+            LOGGER.info(format("Successfully retrieved TOI report for game %s in season %s for team %s", game, season, teamAbbreviation));
+        }
         return toiReport;
     }
 
@@ -43,7 +48,12 @@ public class NhlTimeOnIceClient {
     ) {
         try {
 
-            final String rawHtml = jsoupWrapper.getRawHtmlFromUrl(url);
+            final Optional<String> rawToiReport = jsoupWrapper.getRawHtmlFromUrl(url);
+            if (!rawToiReport.isPresent()) {
+
+                throw new Exception("The raw TOI report was empty");
+            }
+            final String rawHtml = rawToiReport.get();
             final String gameIdSeasonComponent = season.substring(0, 4);
             final String gameId = format("%s%s", gameIdSeasonComponent, game);
             final String versionedS3ObjectKey = format("%s/T%s%s", gameId, teamAbbreviation, game);

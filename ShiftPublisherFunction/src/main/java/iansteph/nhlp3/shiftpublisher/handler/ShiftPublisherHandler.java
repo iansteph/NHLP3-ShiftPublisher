@@ -185,9 +185,16 @@ public class ShiftPublisherHandler implements RequestHandler<ShiftPublisherReque
 
     private Optional<TimeOnIceReport> retrieveTimeOnIceReport(final int gameId, final Team team) {
 
-        final Document rawTeamTimeOnIceReport = nhlTimeOnIceProxy.getToiReportForGame(gameId, team);
-        final Optional<TimeOnIceReport> teamTimeOnIceReport = timeOnIceReportParser.parse(rawTeamTimeOnIceReport);
-        return teamTimeOnIceReport;
+        final Optional<Document> rawTeamTimeOnIceReport = nhlTimeOnIceProxy.getToiReportForGame(gameId, team);
+        if (rawTeamTimeOnIceReport.isPresent()) {
+
+            final Optional<TimeOnIceReport> teamTimeOnIceReport = timeOnIceReportParser.parse(rawTeamTimeOnIceReport.get());
+            return teamTimeOnIceReport;
+        }
+        else {
+
+            return Optional.empty();
+        }
     }
 
     private ShiftEvent buildShiftEvent(final PlayerTimeOnIceReport playerTimeOnIceReport, final Shift shift) {

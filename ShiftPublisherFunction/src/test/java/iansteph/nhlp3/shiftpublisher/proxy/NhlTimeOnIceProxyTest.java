@@ -7,6 +7,8 @@ import org.jsoup.nodes.Document;
 import org.junit.Test;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import java.util.Optional;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -55,9 +57,9 @@ public class NhlTimeOnIceProxyTest {
         final String season = "20192020";
         final String teamAbbreviation = "V";
         final String game = "021079";
-        when(mockNhlTimeOnIceClient.getTeamToiReportForGame(eq(season), eq(teamAbbreviation), eq(game))).thenReturn(new Document("SomeBaseUri"));
+        when(mockNhlTimeOnIceClient.getTeamToiReportForGame(eq(season), eq(teamAbbreviation), eq(game))).thenReturn(Optional.of(new Document("SomeBaseUri")));
 
-        final Document result = nhlTimeOnIceProxy.getToiReportForGame(GAME_ID, TEAM);
+        final Optional<Document> result = nhlTimeOnIceProxy.getToiReportForGame(GAME_ID, TEAM);
 
         assertThat(result, is(notNullValue()));
         verify(mockNhlTimeOnIceClient, times(1)).getTeamToiReportForGame(eq(season), eq(teamAbbreviation), eq(game));

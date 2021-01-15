@@ -4,6 +4,8 @@ import iansteph.nhlp3.shiftpublisher.client.NhlTimeOnIceClient;
 import iansteph.nhlp3.shiftpublisher.model.Team;
 import org.jsoup.nodes.Document;
 
+import java.util.Optional;
+
 import static java.lang.String.format;
 
 public class NhlTimeOnIceProxy {
@@ -19,14 +21,14 @@ public class NhlTimeOnIceProxy {
         this.nhlTimeOnIceClient = nhlTimeOnIceClient;
     }
 
-    public Document getToiReportForGame(final int gameId, final Team team) {
+    public Optional<Document> getToiReportForGame(final int gameId, final Team team) {
 
         validateGameId(gameId);
         validateTeam(team);
         final String season = getSeasonFromGameId(gameId);
         final String teamAbbreviation = team.getLabel();
         final String game = getGameFromGameId(gameId);
-        final Document toiReport = nhlTimeOnIceClient.getTeamToiReportForGame(season, teamAbbreviation, game);
+        final Optional<Document> toiReport = nhlTimeOnIceClient.getTeamToiReportForGame(season, teamAbbreviation, game);
         return toiReport;
     }
 
