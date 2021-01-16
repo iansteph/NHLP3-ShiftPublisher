@@ -1,0 +1,330 @@
+{
+  "copyright" : "NHL and the NHL Shield are registered trademarks of the National Hockey League. NHL and NHL team marks are the property of the NHL and its teams. © NHL 2021. All Rights Reserved.",
+  "roster" : [ {
+    "person" : {
+      "id" : 8467950,
+      "fullName" : "Craig Anderson",
+      "link" : "/api/v1/people/8467950"
+    },
+    "jerseyNumber" : "31",
+    "position" : {
+      "code" : "G",
+      "name" : "Goalie",
+      "type" : "Goalie",
+      "abbreviation" : "G"
+    }
+  }, {
+    "person" : {
+      "id" : 8479482,
+      "fullName" : "Michal Kempny",
+      "link" : "/api/v1/people/8479482"
+    },
+    "jerseyNumber" : "6",
+    "position" : {
+      "code" : "D",
+      "name" : "Defenseman",
+      "type" : "Defenseman",
+      "abbreviation" : "D"
+    }
+  }, {
+    "person" : {
+      "id" : 8465009,
+      "fullName" : "Zdeno Chara",
+      "link" : "/api/v1/people/8465009"
+    },
+    "jerseyNumber" : "33",
+    "position" : {
+      "code" : "D",
+      "name" : "Defenseman",
+      "type" : "Defenseman",
+      "abbreviation" : "D"
+    }
+  }, {
+    "person" : {
+      "id" : 8471214,
+      "fullName" : "Alex Ovechkin",
+      "link" : "/api/v1/people/8471214"
+    },
+    "jerseyNumber" : "8",
+    "position" : {
+      "code" : "L",
+      "name" : "Left Wing",
+      "type" : "Forward",
+      "abbreviation" : "LW"
+    }
+  }, {
+    "person" : {
+      "id" : 8471698,
+      "fullName" : "T.J. Oshie",
+      "link" : "/api/v1/people/8471698"
+    },
+    "jerseyNumber" : "77",
+    "position" : {
+      "code" : "R",
+      "name" : "Right Wing",
+      "type" : "Forward",
+      "abbreviation" : "RW"
+    }
+  }, {
+    "person" : {
+      "id" : 8473563,
+      "fullName" : "Nicklas Backstrom",
+      "link" : "/api/v1/people/8473563"
+    },
+    "jerseyNumber" : "19",
+    "position" : {
+      "code" : "C",
+      "name" : "Center",
+      "type" : "Forward",
+      "abbreviation" : "C"
+    }
+  }, {
+    "person" : {
+      "id" : 8474176,
+      "fullName" : "Carl Hagelin",
+      "link" : "/api/v1/people/8474176"
+    },
+    "jerseyNumber" : "62",
+    "position" : {
+      "code" : "L",
+      "name" : "Left Wing",
+      "type" : "Forward",
+      "abbreviation" : "LW"
+    }
+  }, {
+    "person" : {
+      "id" : 8474189,
+      "fullName" : "Lars Eller",
+      "link" : "/api/v1/people/8474189"
+    },
+    "jerseyNumber" : "20",
+    "position" : {
+      "code" : "C",
+      "name" : "Center",
+      "type" : "Forward",
+      "abbreviation" : "C"
+    }
+  }, {
+    "person" : {
+      "id" : 8474590,
+      "fullName" : "John Carlson",
+      "link" : "/api/v1/people/8474590"
+    },
+    "jerseyNumber" : "74",
+    "position" : {
+      "code" : "D",
+      "name" : "Defenseman",
+      "type" : "Defenseman",
+      "abbreviation" : "D"
+    }
+  }, {
+    "person" : {
+      "id" : 8474602,
+      "fullName" : "Justin Schultz",
+      "link" : "/api/v1/people/8474602"
+    },
+    "jerseyNumber" : "2",
+    "position" : {
+      "code" : "D",
+      "name" : "Defenseman",
+      "type" : "Defenseman",
+      "abbreviation" : "D"
+    }
+  }, {
+    "person" : {
+      "id" : 8475200,
+      "fullName" : "Dmitry Orlov",
+      "link" : "/api/v1/people/8475200"
+    },
+    "jerseyNumber" : "9",
+    "position" : {
+      "code" : "D",
+      "name" : "Defenseman",
+      "type" : "Defenseman",
+      "abbreviation" : "D"
+    }
+  }, {
+    "person" : {
+      "id" : 8475209,
+      "fullName" : "Richard Panik",
+      "link" : "/api/v1/people/8475209"
+    },
+    "jerseyNumber" : "14",
+    "position" : {
+      "code" : "R",
+      "name" : "Right Wing",
+      "type" : "Forward",
+      "abbreviation" : "RW"
+    }
+  }, {
+    "person" : {
+      "id" : 8475324,
+      "fullName" : "Nick Jensen",
+      "link" : "/api/v1/people/8475324"
+    },
+    "jerseyNumber" : "3",
+    "position" : {
+      "code" : "D",
+      "name" : "Defenseman",
+      "type" : "Defenseman",
+      "abbreviation" : "D"
+    }
+  }, {
+    "person" : {
+      "id" : 8475343,
+      "fullName" : "Nic Dowd",
+      "link" : "/api/v1/people/8475343"
+    },
+    "jerseyNumber" : "26",
+    "position" : {
+      "code" : "C",
+      "name" : "Center",
+      "type" : "Forward",
+      "abbreviation" : "C"
+    }
+  }, {
+    "person" : {
+      "id" : 8475455,
+      "fullName" : "Brenden Dillon",
+      "link" : "/api/v1/people/8475455"
+    },
+    "jerseyNumber" : "4",
+    "position" : {
+      "code" : "D",
+      "name" : "Defenseman",
+      "type" : "Defenseman",
+      "abbreviation" : "D"
+    }
+  }, {
+    "person" : {
+      "id" : 8475744,
+      "fullName" : "Evgeny Kuznetsov",
+      "link" : "/api/v1/people/8475744"
+    },
+    "jerseyNumber" : "92",
+    "position" : {
+      "code" : "C",
+      "name" : "Center",
+      "type" : "Forward",
+      "abbreviation" : "C"
+    }
+  }, {
+    "person" : {
+      "id" : 8476880,
+      "fullName" : "Tom Wilson",
+      "link" : "/api/v1/people/8476880"
+    },
+    "jerseyNumber" : "43",
+    "position" : {
+      "code" : "R",
+      "name" : "Right Wing",
+      "type" : "Forward",
+      "abbreviation" : "RW"
+    }
+  }, {
+    "person" : {
+      "id" : 8477839,
+      "fullName" : "Conor Sheary",
+      "link" : "/api/v1/people/8477839"
+    },
+    "jerseyNumber" : "73",
+    "position" : {
+      "code" : "L",
+      "name" : "Left Wing",
+      "type" : "Forward",
+      "abbreviation" : "LW"
+    }
+  }, {
+    "person" : {
+      "id" : 8477845,
+      "fullName" : "Trevor van Riemsdyk",
+      "link" : "/api/v1/people/8477845"
+    },
+    "jerseyNumber" : "57",
+    "position" : {
+      "code" : "D",
+      "name" : "Defenseman",
+      "type" : "Defenseman",
+      "abbreviation" : "D"
+    }
+  }, {
+    "person" : {
+      "id" : 8477903,
+      "fullName" : "Garnet Hathaway",
+      "link" : "/api/v1/people/8477903"
+    },
+    "jerseyNumber" : "21",
+    "position" : {
+      "code" : "R",
+      "name" : "Right Wing",
+      "type" : "Forward",
+      "abbreviation" : "RW"
+    }
+  }, {
+    "person" : {
+      "id" : 8477944,
+      "fullName" : "Jakub Vrana",
+      "link" : "/api/v1/people/8477944"
+    },
+    "jerseyNumber" : "13",
+    "position" : {
+      "code" : "L",
+      "name" : "Left Wing",
+      "type" : "Forward",
+      "abbreviation" : "LW"
+    }
+  }, {
+    "person" : {
+      "id" : 8477970,
+      "fullName" : "Vitek Vanecek",
+      "link" : "/api/v1/people/8477970"
+    },
+    "jerseyNumber" : "41",
+    "position" : {
+      "code" : "G",
+      "name" : "Goalie",
+      "type" : "Goalie",
+      "abbreviation" : "G"
+    }
+  }, {
+    "person" : {
+      "id" : 8478399,
+      "fullName" : "Jonas Siegenthaler",
+      "link" : "/api/v1/people/8478399"
+    },
+    "jerseyNumber" : "34",
+    "position" : {
+      "code" : "D",
+      "name" : "Defenseman",
+      "type" : "Defenseman",
+      "abbreviation" : "D"
+    }
+  }, {
+    "person" : {
+      "id" : 8478466,
+      "fullName" : "Daniel Sprong",
+      "link" : "/api/v1/people/8478466"
+    },
+    "jerseyNumber" : "10",
+    "position" : {
+      "code" : "R",
+      "name" : "Right Wing",
+      "type" : "Forward",
+      "abbreviation" : "RW"
+    }
+  }, {
+    "person" : {
+      "id" : 8478492,
+      "fullName" : "Ilya Samsonov",
+      "link" : "/api/v1/people/8478492"
+    },
+    "jerseyNumber" : "30",
+    "position" : {
+      "code" : "G",
+      "name" : "Goalie",
+      "type" : "Goalie",
+      "abbreviation" : "G"
+    }
+  } ],
+  "link" : "/api/v1/teams/15/roster"
+}

@@ -201,16 +201,31 @@ public class TimeOnIceReportParser {
         timeOnIceReportWithVisitorAndHomeContext.setDate(rawDate);
 
         // Venue context
-        final String[] rawVenueContextComponents = rawSharedGameContext.get(2 + indexOffsetIfPlayoffGame).split("at");
 
-        // Attendance
-        final String[] attendanceComponents = rawVenueContextComponents[0].split(" ");
-        final String attendance = attendanceComponents[1].trim();
-        timeOnIceReportWithVisitorAndHomeContext.setAttendance(attendance);
+        /*
+         * For the COVID impacted NHL seasons there appears to be a change to the venue and attendance line on the TOI report. For venues
+         * that do not allow fans (or for some other reason) there is no "Attendance X at <VENUE_NAME>" and it is just "<VENUE_NAME>"
+         */
+        final String rawVenueAndAttendance = rawSharedGameContext.get(2 + indexOffsetIfPlayoffGame);
+        if (rawVenueAndAttendance.contains(" at ")) {
 
-        // Venue name
-        final String venueName = rawVenueContextComponents[1].trim();
-        timeOnIceReportWithVisitorAndHomeContext.setVenueName(venueName);
+            final String[] rawVenueContextComponents = rawVenueAndAttendance.split("at");
+
+            // Attendance
+            final String[] attendanceComponents = rawVenueContextComponents[0].split(" ");
+            final String attendance = attendanceComponents[1].trim();
+            timeOnIceReportWithVisitorAndHomeContext.setAttendance(attendance);
+
+            // Venue name
+            final String venueName = rawVenueContextComponents[1].trim();
+            timeOnIceReportWithVisitorAndHomeContext.setVenueName(venueName);
+        }
+        else {
+
+            // There is no "at" nor attendance information. It is just the venue name
+            timeOnIceReportWithVisitorAndHomeContext.setAttendance(null);
+            timeOnIceReportWithVisitorAndHomeContext.setVenueName(rawVenueAndAttendance);
+        }
 
         // Game time
         final String[] gameTimeComponents = rawSharedGameContext.get(3 + indexOffsetIfPlayoffGame).split(";");

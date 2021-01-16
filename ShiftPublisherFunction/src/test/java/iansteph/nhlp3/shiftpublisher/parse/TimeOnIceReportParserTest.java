@@ -45,6 +45,8 @@ public class TimeOnIceReportParserTest {
     private static final String PLAYOFF_HOME_GAME_TOI_REPORT_TEST_RESOURCE = "src/test/resources/timeonicereports/playoff-game.HTM";
     private static final String REGULAR_SEASON_VISITOR_GAME_ROSTER_TEST_RESOURCE = "src/test/resources/rosters/regular-season-game.json";
     private static final String REGULAR_SEASON_VISITOR_GAME_TOI_REPORT_TEST_RESOURCE = "src/test/resources/timeonicereports/regular-season-game.HTM";
+    private static final String NO_ATTENDANCE_DATA_ROSTER_TEST_RESOURCE = "src/test/resources/rosters/no-attendance-data.json";
+    private static final String NO_ATTENDANCE_DATA_TOI_REPORT_TEST_RESOURCE = "src/test/resources/timeonicereports/no-attendance-data.HTM";
 
     private final NhlDataProxy mockNhlDataProxy = mock(NhlDataProxy.class);
     private final TimeOnIceReportParser timeOnIceReportParser = new TimeOnIceReportParser(mockNhlDataProxy);
@@ -139,6 +141,37 @@ public class TimeOnIceReportParserTest {
         assertThat(timeOnIceReport.getHomeTeamId(), is(8));
         assertThat(timeOnIceReport.getHomeTeamGameNumber(), is(1));
         assertThat(timeOnIceReport.getHomeTeamHomeGameNumber(), is(1));
+        verifyPlayerTimeOnIceReports(timeOnIceReport.getPlayerTimeOnIceReports());
+    }
+
+    @Test
+    public void test_parse_successfully_parses_time_on_ice_report_for_a_given_team_and_with_no_attendance_data() throws IOException {
+
+        final Roster roster = parseTestResourceIntoRoster(NO_ATTENDANCE_DATA_ROSTER_TEST_RESOURCE);
+        when(mockNhlDataProxy.getRosterForTeamId(anyInt())).thenReturn(roster);
+        final Document document = loadTestResourceAsDocumentFromFile(NO_ATTENDANCE_DATA_TOI_REPORT_TEST_RESOURCE);
+
+        final Optional<TimeOnIceReport> optionalTimeOnIceReport = timeOnIceReportParser.parse(document);
+
+        assertThat(optionalTimeOnIceReport, is(not(Optional.empty())));
+        final TimeOnIceReport timeOnIceReport = optionalTimeOnIceReport.get();
+        assertThat(timeOnIceReport.getDate(), is("Friday, January 15, 2021"));
+        assertThat(timeOnIceReport.getAttendance(), is(nullValue()));
+        assertThat(timeOnIceReport.getVenueName(), is("KeyBank Center"));
+        assertThat(timeOnIceReport.getStartTime(), is("7:07 EST"));
+        assertThat(timeOnIceReport.getEndTime(), is(nullValue()));
+        assertThat(timeOnIceReport.getNhlGameNumber(), is("0017"));
+        assertThat(timeOnIceReport.getGameState(), is("Period 3 (09:51 Remaining)"));
+        assertThat(timeOnIceReport.getVisitorTeamScore(), is(2));
+        assertThat(timeOnIceReport.getVisitorTeamName(), is("WASHINGTON CAPITALS"));
+        assertThat(timeOnIceReport.getVisitorTeamId(), is(15));
+        assertThat(timeOnIceReport.getVisitorTeamGameNumber(), is(2));
+        assertThat(timeOnIceReport.getVisitorTeamAwayGameNumber(), is(2));
+        assertThat(timeOnIceReport.getHomeTeamScore(), is(1));
+        assertThat(timeOnIceReport.getHomeTeamName(), is("BUFFALO SABRES"));
+        assertThat(timeOnIceReport.getHomeTeamId(), is(7));
+        assertThat(timeOnIceReport.getHomeTeamGameNumber(), is(2));
+        assertThat(timeOnIceReport.getHomeTeamHomeGameNumber(), is(2));
         verifyPlayerTimeOnIceReports(timeOnIceReport.getPlayerTimeOnIceReports());
     }
 
