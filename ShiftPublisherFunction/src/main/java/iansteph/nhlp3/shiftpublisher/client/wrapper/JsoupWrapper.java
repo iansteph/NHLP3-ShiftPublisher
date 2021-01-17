@@ -30,6 +30,11 @@ public class JsoupWrapper {
                 LOGGER.info("Encountered HTTP Status Code 404 for the URL: interpreting as if game is too far into the future for the TOI report to exist yet");
                 return Optional.empty();
             }
+            else if (httpStatusCode == 403) {
+
+                LOGGER.info("Encountered HTTP Status Code 403 for the URL: interpreting as an intermittent NHL server-side issue preventing retrieving the TOI report");
+                return Optional.empty();
+            }
             else {
 
                 LOGGER.info(format("Encountered HTTP Status Code %d when parsing HTML from URL for URL %s", httpStatusCode, url), e);

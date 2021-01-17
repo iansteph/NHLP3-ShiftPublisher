@@ -61,6 +61,17 @@ public class JsoupWrapperTest {
         assertThat(actualDocument, is(Optional.empty()));
     }
 
+    @Test
+    public void test_parseHtmlFromUrl_returns_empty_optional_when_endpoint_returns_http_status_code_403() throws IOException {
+
+        when(mockConnection.get()).thenThrow(new HttpStatusException("Access Denied", 403, WWW_NHL_COM));
+
+        final Optional<Document> actualDocument = jsoupWrapper.parseHtmlFromUrl(WWW_NHL_COM);
+
+        assertThat(actualDocument, is(notNullValue()));
+        assertThat(actualDocument, is(Optional.empty()));
+    }
+
     @Test(expected = RuntimeException.class)
     public void test_parseHtmlFromUrl_throws_exception_when_endpoint_returns_http_status_exception_without_code_404() throws IOException {
 
