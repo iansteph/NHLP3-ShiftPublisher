@@ -207,7 +207,19 @@ public class TimeOnIceReportParser {
          * that do not allow fans (or for some other reason) there is no "Attendance X at <VENUE_NAME>" and it is just "<VENUE_NAME>"
          */
         final String rawVenueAndAttendance = rawSharedGameContext.get(2 + indexOffsetIfPlayoffGame);
-        if (rawVenueAndAttendance.contains(" at ")) {
+
+        // Another case where attendance has no data but is rendered just so slightly differently
+        if (rawVenueAndAttendance.contains("Attendance at")) {
+
+            // Attendance
+            timeOnIceReportWithVisitorAndHomeContext.setAttendance(null);
+
+            // Venue name
+            final String[] rawVenueContextComponents = rawVenueAndAttendance.split("at");
+            final String venueName = rawVenueContextComponents[1].trim();
+            timeOnIceReportWithVisitorAndHomeContext.setVenueName(venueName);
+        }
+        else if (rawVenueAndAttendance.contains(" at ")) {
 
             final String[] rawVenueContextComponents = rawVenueAndAttendance.split("at");
 
