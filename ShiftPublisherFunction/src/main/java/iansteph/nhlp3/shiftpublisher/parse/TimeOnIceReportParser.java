@@ -335,29 +335,58 @@ public class TimeOnIceReportParser {
 
                     // Period
                     final String period = columns.get(1);
-                    shift.setPeriod(period);
+                    if (period.isEmpty() && shifts.isEmpty()) {
+
+                        // If the period is missing and there's no previous shift then it is the beginning of the game
+                        shift.setPeriod("1");
+                    }
+                    else if (period.isEmpty()) {
+
+                        // If the period is missing then use the last shift's period for this current shift's period
+                        shift.setPeriod(shifts.get(shifts.size() - 1).getPeriod());
+                    }
+                    else {
+
+                        shift.setPeriod(period);
+                    }
 
                     // Start of shift column
                     final String[] rawStartOfShift = columns.get(2).split("/");
 
-                    // Shift start elapsed time
-                    final Duration shiftStartElapsedTime = durationFromTextNode(rawStartOfShift[0]);
-                    shift.setShiftStartElapsedTimeInSeconds(convertDurationToSeconds(shiftStartElapsedTime));
+                    if (rawStartOfShift.length == 2) {
 
-                    // Shift start game clock time
-                    final Duration shiftStartGameClockTime = durationFromTextNode(rawStartOfShift[1]);
-                    shift.setShiftStartGameClockTimeInSeconds(convertDurationToSeconds(shiftStartGameClockTime));
+                        // Shift start elapsed time
+                        final Duration shiftStartElapsedTime = durationFromTextNode(rawStartOfShift[0]);
+                        shift.setShiftStartElapsedTimeInSeconds(convertDurationToSeconds(shiftStartElapsedTime));
+
+                        // Shift start game clock time
+                        final Duration shiftStartGameClockTime = durationFromTextNode(rawStartOfShift[1]);
+                        shift.setShiftStartGameClockTimeInSeconds(convertDurationToSeconds(shiftStartGameClockTime));
+                    }
+                    else {
+
+                        shift.setShiftStartElapsedTimeInSeconds(0);
+                        shift.setShiftStartGameClockTimeInSeconds(0);
+                    }
 
                     // End of shift column
                     final String[] rawEndOfShift = columns.get(3).split("/");
 
-                    // Shift start elapsed time
-                    final Duration endOfShiftElapsedTime = durationFromTextNode(rawEndOfShift[0]);
-                    shift.setShiftEndElapsedTimeInSeconds(convertDurationToSeconds(endOfShiftElapsedTime));
+                    if (rawEndOfShift.length == 2) {
 
-                    // Shift start game clock time
-                    final Duration endOfShiftGameClockTime = durationFromTextNode(rawEndOfShift[1]);
-                    shift.setShiftEndGameClockTimeInSeconds(convertDurationToSeconds(endOfShiftGameClockTime));
+                        // Shift start elapsed time
+                        final Duration endOfShiftElapsedTime = durationFromTextNode(rawEndOfShift[0]);
+                        shift.setShiftEndElapsedTimeInSeconds(convertDurationToSeconds(endOfShiftElapsedTime));
+
+                        // Shift start game clock time
+                        final Duration endOfShiftGameClockTime = durationFromTextNode(rawEndOfShift[1]);
+                        shift.setShiftEndGameClockTimeInSeconds(convertDurationToSeconds(endOfShiftGameClockTime));
+                    }
+                    else {
+
+                        shift.setShiftEndElapsedTimeInSeconds(0);
+                        shift.setShiftEndGameClockTimeInSeconds(0);
+                    }
 
                     // Duration
                     final String rawShiftDuration = columns.get(4);

@@ -49,6 +49,8 @@ public class TimeOnIceReportParserTest {
     private static final String NO_ATTENDANCE_DATA_TOI_REPORT_TEST_RESOURCE = "src/test/resources/timeonicereports/no-attendance-data.HTM";
     private static final String NO_ATTENDANCE_DATA_ALTERNATE_ROSTER_TEST_RESOURCE = "src/test/resources/rosters/no-attendance-data-alternate.json";
     private static final String NO_ATTENDANCE_DATA_ALTERNATE_TOI_REPORT_TEST_RESOURCE = "src/test/resources/timeonicereports/no-attendance-date-alternate.HTM";
+    private static final String MISSING_SHIFT_START_OR_SHIFT_END_OR_PERIOD_ROSTER_TEST_RESOURCE = "src/test/resources/rosters/missing-shift-start-or-shift-end-or-period.json";
+    private static final String MISSING_SHIFT_START_OR_SHIFT_END_OR_PERIOD_TOI_REPORT_TEST_RESOURCE = "src/test/resources/timeonicereports/missing-shift-start-or-shift-end-or-period.HTM";
 
     private final NhlDataProxy mockNhlDataProxy = mock(NhlDataProxy.class);
     private final TimeOnIceReportParser timeOnIceReportParser = new TimeOnIceReportParser(mockNhlDataProxy);
@@ -209,6 +211,37 @@ public class TimeOnIceReportParserTest {
     }
 
     @Test
+    public void test_parse_successfully_parses_time_on_ice_report_for_report_with_shifts_missing_shift_start_or_shift_end_or_period_using_fallbacks() throws IOException {
+
+        final Roster roster = parseTestResourceIntoRoster(MISSING_SHIFT_START_OR_SHIFT_END_OR_PERIOD_ROSTER_TEST_RESOURCE);
+        when(mockNhlDataProxy.getRosterForTeamId(anyInt())).thenReturn(roster);
+        final Document document = loadTestResourceAsDocumentFromFile(MISSING_SHIFT_START_OR_SHIFT_END_OR_PERIOD_TOI_REPORT_TEST_RESOURCE);
+
+        final Optional<TimeOnIceReport> optionalTimeOnIceReport = timeOnIceReportParser.parse(document);
+
+        assertThat(optionalTimeOnIceReport, is(not(Optional.empty())));
+        final TimeOnIceReport timeOnIceReport = optionalTimeOnIceReport.get();
+        assertThat(timeOnIceReport.getDate(), is("Friday, January 22, 2021"));
+        assertThat(timeOnIceReport.getAttendance(), is(nullValue()));
+        assertThat(timeOnIceReport.getVenueName(), is("Scotiabank Arena"));
+        assertThat(timeOnIceReport.getStartTime(), is("7:06 EST"));
+        assertThat(timeOnIceReport.getEndTime(), is(nullValue()));
+        assertThat(timeOnIceReport.getNhlGameNumber(), is("0070"));
+        assertThat(timeOnIceReport.getGameState(), is("End of Period 1"));
+        assertThat(timeOnIceReport.getVisitorTeamScore(), is(0));
+        assertThat(timeOnIceReport.getVisitorTeamName(), is("EDMONTON OILERS"));
+        assertThat(timeOnIceReport.getVisitorTeamId(), is(22));
+        assertThat(timeOnIceReport.getVisitorTeamGameNumber(), is(6));
+        assertThat(timeOnIceReport.getVisitorTeamAwayGameNumber(), is(2));
+        assertThat(timeOnIceReport.getHomeTeamScore(), is(0));
+        assertThat(timeOnIceReport.getHomeTeamName(), is("TORONTO MAPLE LEAFS"));
+        assertThat(timeOnIceReport.getHomeTeamId(), is(10));
+        assertThat(timeOnIceReport.getHomeTeamGameNumber(), is(6));
+        assertThat(timeOnIceReport.getHomeTeamHomeGameNumber(), is(4));
+        verifyPlayerTimeOnIceReports(timeOnIceReport.getPlayerTimeOnIceReports());
+    }
+
+    @Test
     public void test_parse_successfully_parses_time_on_ice_report_for_a_given_team_with_no_shift_data() throws IOException {
 
         final Roster roster = parseTestResourceIntoRoster(NO_SHIFT_DATA_ROSTER_TEST_RESOURCE);
@@ -268,9 +301,10 @@ public class TimeOnIceReportParserTest {
 
                 final String key = entry.getKey();
                 final List<Shift> shifts = entry.getValue();
-                final ShiftAggregation match = summary.getShiftAggregations().stream()
+                final List<ShiftAggregation> shiftAggregations = summary.getShiftAggregations().stream()
                         .filter(shiftAggregation -> shiftAggregation.getAggregationName().equals(key))
-                        .collect(Collectors.toList()).get(0);
+                        .collect(Collectors.toList());
+                final ShiftAggregation match = shiftAggregations.get(0);
                 assertThat(match.getAggregationName(), is(key));
                 assertThat(match.getShiftsFor(), is(shifts.size()));
                 assertThat(match.getTimeOnIceInSeconds(), is(notNullValue()));
@@ -284,8 +318,14 @@ public class TimeOnIceReportParserTest {
 
         assertTrue(shift.getShiftNumber() > 0);
         assertThat(shift.getPeriod(), is(notNullValue()));
-        assertTrue(shift.getShiftStartElapsedTimeInSeconds() <= shift.getShiftEndElapsedTimeInSeconds());
-        assertTrue(shift.getShiftStartGameClockTimeInSeconds() >= shift.getShiftEndGameClockTimeInSeconds());
+
+        final boolean hasAnEmptyStartOrEndOfShiftData = (shift.getShiftStartElapsedTimeInSeconds() == 0 && shift.getShiftStartGameClockTimeInSeconds() == 0) ||
+                (shift.getShiftEndElapsedTimeInSeconds() == 0 && shift.getShiftEndGameClockTimeInSeconds() == 0);
+        if (!hasAnEmptyStartOrEndOfShiftData) {
+
+            assertTrue(shift.getShiftStartElapsedTimeInSeconds() <= shift.getShiftEndElapsedTimeInSeconds());
+            assertTrue(shift.getShiftStartGameClockTimeInSeconds() >= shift.getShiftEndGameClockTimeInSeconds());
+        }
         assertTrue(shift.getShiftDurationInSeconds() > 0);
         assertThat(shift.getHasGoalDuringShift(), is(notNullValue()));
         assertThat(shift.getHasPenaltyDuringShift(), is(notNullValue()));
@@ -324,6 +364,7 @@ public class TimeOnIceReportParserTest {
 
     private void verifyPlayer(final Player player) {
 
+        assertThat(player, is(notNullValue()));
         assertThat(player.getJerseyNumber(), is(notNullValue()));
         assertThat(player.getPerson(), is(notNullValue()));
         assertThat(player.getPosition(), is(notNullValue()));
